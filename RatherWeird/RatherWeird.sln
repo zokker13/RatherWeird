@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.7
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RatherWeird", "RatherWeird\RatherWeird.csproj", "{21E1C354-B98F-40E8-82A0-3D21C884E57D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowHook", "WindowHook\WindowHook.csproj", "{0291EE27-F4EF-4A39-BD4C-BEEB22E6D41D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DirtyInvocation", "DirtyInvocation\DirtyInvocation.csproj", "{B4A8B8C7-01EF-4A17-A4FE-D9ABE2974AF1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{21E1C354-B98F-40E8-82A0-3D21C884E57D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21E1C354-B98F-40E8-82A0-3D21C884E57D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21E1C354-B98F-40E8-82A0-3D21C884E57D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21E1C354-B98F-40E8-82A0-3D21C884E57D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0291EE27-F4EF-4A39-BD4C-BEEB22E6D41D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0291EE27-F4EF-4A39-BD4C-BEEB22E6D41D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0291EE27-F4EF-4A39-BD4C-BEEB22E6D41D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0291EE27-F4EF-4A39-BD4C-BEEB22E6D41D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4A8B8C7-01EF-4A17-A4FE-D9ABE2974AF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4A8B8C7-01EF-4A17-A4FE-D9ABE2974AF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4A8B8C7-01EF-4A17-A4FE-D9ABE2974AF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4A8B8C7-01EF-4A17-A4FE-D9ABE2974AF1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
