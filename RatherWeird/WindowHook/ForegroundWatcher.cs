@@ -71,7 +71,8 @@ namespace WindowHook
                 , _del
                 , 0
                 , 0
-                , WINEVENT_OUTOFCONTEXT);
+                , WINEVENT_OUTOFCONTEXT
+            );
         }
        
         public void Unhook()

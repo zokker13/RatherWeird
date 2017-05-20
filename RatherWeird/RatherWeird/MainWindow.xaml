@@ -5,8 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RatherWeird"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525" Unloaded="Window_Unloaded">
+        Title="MainWindow" Height="350" Width="525" Loaded="Window_Loaded" Closed="Window_Closed">
     <Grid Loaded="Grid_Loaded">
-        
+        <GroupBox x:Name="gpWindowBehavior" Header="Window Behavior" HorizontalAlignment="Left" Height="164" Margin="10,10,0,0" VerticalAlignment="Top" Width="267">
+            <Grid Margin="0,0,-2,-12">
+                <CheckBox x:Name="chLockCursor" Content="Lock Cursor" HorizontalAlignment="Left" Margin="10,31,0,0" VerticalAlignment="Top" Click="chLockCursor_Click"/>
+                <CheckBox x:Name="chInvokeAltUp" Content="Invoke ALT UP" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="chInvokeAltUp_Click"/>
+            </Grid>
+        </GroupBox>
     </Grid>
 </Window>
