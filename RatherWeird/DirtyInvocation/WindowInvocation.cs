@@ -94,13 +94,6 @@ namespace DirtyInvocation
         GWL_WNDPROC = -4,
     }
 
-    public enum MONITOR : uint
-    {
-        MONITOR_DEFAULTTONULL= 0,
-        MONITOR_DEFAULTTOPRIMARY = 1,
-        MONITOR_DEFAULTTONEAREST = 2
-    }
-
     public enum WindowSizing : uint
     {
         SWP_FRAMECHANGED = 0x0020
