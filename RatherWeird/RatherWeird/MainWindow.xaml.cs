@@ -53,15 +53,18 @@ namespace RatherWeird
             if (e.Process.ProcessName!= "ra3_1.12.game")
                 return;
 
+            WindowInvocation.DropBorder(e.Process);
+            WindowInvocation.ResizeWindow(e.Process);
+
             if (settings.LockCursor)
                 WindowInvocation.LockToProcess(e.Process);
             
             if (settings.InvokeAltUp)
                 Messaging.InvokeKeyUp(e.Process.MainWindowHandle, 0x12);    // ALT key
 
-            WindowInvocation.DropBorder(e.Process);
 
-            WindowInvocation.ResizeWindow(e.Process);
+            
+            
 
             //Messaging.SendMessage(e.Process.MainWindowHandle, Messaging.WM_KEYUP, (IntPtr)0x12, IntPtr.Zero);
         }
@@ -96,5 +99,6 @@ namespace RatherWeird
             chInvokeAltUp.IsChecked = settings.InvokeAltUp;
             chLockCursor.IsChecked = settings.LockCursor;
         }
+        
     }
 }

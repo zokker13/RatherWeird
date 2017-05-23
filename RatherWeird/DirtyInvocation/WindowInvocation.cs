@@ -107,10 +107,14 @@ namespace DirtyInvocation
         WS_BORDER = 0x00800000L,
         WS_MINIMIZE = 0x20000000,
         WS_MAXIMIZE = 0x01000000,
-        WS_CAPTION = 0x00C00000,
+        WS_CAPTION = 0x00C00000,    
         WS_SYSMENU = 0x00080000,
-        WS_THICKFRAME = 0x00040000
-    }
+        WS_THICKFRAME = 0x00040000,
+        WS_MINIMIZEBOX = 0x00020000,
+        WS_MAXIMIZEBOX = 0x00010000,
+        WS_SIZEBOX = 0x00040000,
+        WS_OVERLAPPED = 00000000,
+    };
 
     public struct RECT
     {
