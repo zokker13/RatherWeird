@@ -12,28 +12,31 @@ namespace DirtyInvocation
 {
     public static class WindowInvocation
     {
-        [DllImport("user32.dll", SetLastError = true)]
-        static extern bool GetWindowRect(IntPtr hwnd, out RECT lpRect);
-
-        [DllImport("user32.dll")]
-        static extern bool ClipCursor(ref RECT lpRect);
-
-        [DllImport("user32.dll")]
-        static extern bool GetClipCursor(out RECT lpRect);
+        #region PInvokes 
 
         [DllImport("user32.dll", SetLastError = true)]
-        public static extern long GetWindowLong(IntPtr hWnd, int nIndex);
+        private static extern bool GetWindowRect(IntPtr hwnd, out RECT lpRect);
 
-        [DllImport("user32.dll", EntryPoint = "SetWindowLong")]
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool ClipCursor(ref RECT lpRect);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool GetClipCursor(out RECT lpRect);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern long GetWindowLong(IntPtr hWnd, int nIndex);
+
+        [DllImport("user32.dll", EntryPoint = "SetWindowLong", SetLastError = true)]
         private static extern int SetWindowLong32(IntPtr hWnd, int nIndex, int dwNewLong);
 
-        [DllImport("user32.dll", EntryPoint = "SetWindowLongPtr")]
+        [DllImport("user32.dll", EntryPoint = "SetWindowLongPtr", SetLastError = true)]
         private static extern IntPtr SetWindowLongPtr64(IntPtr hWnd, int nIndex, long dwNewLong);
 
-        [DllImport("user32.dll", EntryPoint = "SetWindowPos")]
+        [DllImport("user32.dll", EntryPoint = "SetWindowPos", SetLastError = true)]
         public static extern IntPtr SetWindowPos(IntPtr hWnd, int hWndInsertAfter, int x, int y, int cx, int cy,
             uint wFlags);
 
+        #endregion
 
         // This static method is required because legacy OSes do not support
         // SetWindowLongPtr
