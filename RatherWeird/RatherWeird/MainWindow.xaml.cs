@@ -50,14 +50,18 @@ namespace RatherWeird
         {
             Title = e.Process.ProcessName;
 
-            if (e.Process.MainModule.ModuleName != "RA3_1.12.game")
+            if (e.Process.ProcessName!= "ra3_1.12.game")
                 return;
 
             if (settings.LockCursor)
-                LockCursor.LockToProcess(e.Process);
+                WindowInvocation.LockToProcess(e.Process);
             
             if (settings.InvokeAltUp)
                 Messaging.InvokeKeyUp(e.Process.MainWindowHandle, 0x12);    // ALT key
+
+            WindowInvocation.DropBorder(e.Process);
+
+            WindowInvocation.ResizeWindow(e.Process);
 
             //Messaging.SendMessage(e.Process.MainWindowHandle, Messaging.WM_KEYUP, (IntPtr)0x12, IntPtr.Zero);
         }
