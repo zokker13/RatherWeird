@@ -35,11 +35,11 @@ namespace RatherWeird
 
                 result = true;
             }
-            catch (IOException ex)
+            catch (IOException)
             {
                 // TODO log or whatever
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // TODO: Same 
             }

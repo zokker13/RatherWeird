@@ -32,19 +32,7 @@ namespace RatherWeird
 
         public MainWindow()
         {
-            InitializeComponent();
-            
-            
-        }
-
-        private void Grid_Loaded(object sender, RoutedEventArgs e)
-        {
-            _foregroundWatcher.HookForeground();
-            _keyboardWatcher.HookKeyboard();
-
-            _foregroundWatcher.ForegroundChanged += ForegroundWatcher_ForegroundChanged;
-
-            SetupControls();
+            InitializeComponent();   
         }
 
         private void ForegroundWatcher_ForegroundChanged(object sender, ForegroundArgs e)
@@ -92,6 +80,12 @@ namespace RatherWeird
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             settings = Preferences.Load();
+            SetupControls();
+
+            _foregroundWatcher.HookForeground();
+            _keyboardWatcher.HookKeyboard();
+
+            _foregroundWatcher.ForegroundChanged += ForegroundWatcher_ForegroundChanged;
         }
 
         private void Window_Closed(object sender, EventArgs e)
@@ -123,23 +117,9 @@ namespace RatherWeird
         {
             try
             {
-                using (FileStream fs = new FileStream(fileToCheck, FileMode.CreateNew, FileAccess.Write,
-                    FileShare.None, bufferSize: 4096, useAsync: true))
-                {
-                    
-                }
-
-                // Nothing thrown.. File was created..
-                File.Delete(fileToCheck);
-
-                return false;
+                return File.Exists(fileToCheck);
             }
-            catch (System.IO.IOException ex)
-            {
-                // Assuming the file already exists..
-                return true;
-            }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
