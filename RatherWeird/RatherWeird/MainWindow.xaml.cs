@@ -37,8 +37,6 @@ namespace RatherWeird
 
         private void ForegroundWatcher_ForegroundChanged(object sender, ForegroundArgs e)
         {
-            Title = e.Process.ProcessName;
-
             if (e.Process.ProcessName!= "ra3_1.12.game")
                 return;
 

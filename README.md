@@ -8,4 +8,9 @@ A stupid tool with a stupid name to manipulate RA3 in a good manner
 * Lock mouse cursor in RA3 window
 
 ## Todo
-- Add borders around window to move it around
+* Add borders around window to move it around
+* When pressing Enter on the numpad, simulate Enter on the main keyboard
+
+## Screenshots
+### Main Application
+![main_app](docs/main_app.png)
