@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -13,9 +15,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 using WindowHook;
 using DirtyInvocation;
+using Microsoft.Win32;
 
 namespace RatherWeird
 {
@@ -43,7 +45,6 @@ namespace RatherWeird
             _foregroundWatcher.ForegroundChanged += ForegroundWatcher_ForegroundChanged;
 
             SetupControls();
-
         }
 
         private void ForegroundWatcher_ForegroundChanged(object sender, ForegroundArgs e)
@@ -62,10 +63,16 @@ namespace RatherWeird
             if (settings.InvokeAltUp)
                 Messaging.InvokeKeyUp(e.Process.MainWindowHandle, 0x12);    // ALT key
 
-
-            
-            
-
+            if (settings.RefreshPathToRa3)
+            {
+                // Dirty?
+                string manualPath = Path.Combine(
+                    Path.GetDirectoryName(Path.GetDirectoryName(e.Process.MainModule.FileName))
+                    , "RA3.exe"
+                );
+                txtRa3Path.Text = manualPath;
+            }
+                
             //Messaging.SendMessage(e.Process.MainWindowHandle, Messaging.WM_KEYUP, (IntPtr)0x12, IntPtr.Zero);
         }
 
@@ -98,7 +105,98 @@ namespace RatherWeird
         {
             chInvokeAltUp.IsChecked = settings.InvokeAltUp;
             chLockCursor.IsChecked = settings.LockCursor;
+            chLaunchRa3Windowed.IsChecked = settings.LaunchRa3Windowed;
+            chRefreshPathToRa3.IsChecked = settings.RefreshPathToRa3;
+
+            txtRa3Path.Text = GetRa3Executable();
         }
-        
+
+        private void chLaunchRa3Windowed_Click(object sender, RoutedEventArgs e)
+        {
+            var adhocSender = sender as CheckBox;
+            settings.LaunchRa3Windowed = adhocSender?.IsChecked == true;
+        }
+
+        private bool CheckFileExistence(string fileToCheck)
+        {
+            try
+            {
+                using (FileStream fs = new FileStream(fileToCheck, FileMode.CreateNew, FileAccess.Write,
+                    FileShare.None, bufferSize: 4096, useAsync: true))
+                {
+                    
+                }
+
+                // Nothing thrown.. File was created..
+                File.Delete(fileToCheck);
+
+                return false;
+            }
+            catch (System.IO.IOException ex)
+            {
+                // Assuming the file already exists..
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        private string GetRa3ExecutableFromRegistry()
+        {
+            string pathToRa3 = "";
+            try
+            {
+                pathToRa3 = (string) Registry.GetValue(
+                    @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RA3.exe"
+                    , null
+                    , null
+                );
+            }
+            catch (Exception)
+            {
+                // TODO: Report..?
+            }
+
+            return pathToRa3;
+        }
+
+        private string GetRa3Executable()
+        {
+            if (CheckFileExistence(settings.Ra3ExecutablePath))
+                return settings.Ra3ExecutablePath;
+
+            string pathFromRegistry = GetRa3ExecutableFromRegistry();
+            if (CheckFileExistence(pathFromRegistry))
+                return pathFromRegistry;
+
+            return "";
+        }
+
+        private void chRefreshPathToRa3_Click(object sender, RoutedEventArgs e)
+        {
+            var adhocSender = sender as CheckBox;
+            settings.RefreshPathToRa3 = adhocSender?.IsChecked == true;
+        }
+
+        private void btnLaunchRa3_Click(object sender, RoutedEventArgs e)
+        {
+            string pathToRa3 = GetRa3Executable();
+            if (pathToRa3 == "")
+                return; // TODO: Call message!?
+
+            string arguments = settings.LaunchRa3Windowed
+                ? " -win"
+                : "";
+
+            Process.Start(pathToRa3, arguments);
+        }
+
+        private void txtRa3Path_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var adhocSender = sender as TextBox;
+            settings.Ra3ExecutablePath = adhocSender?.Text;
+        }
     }
 }

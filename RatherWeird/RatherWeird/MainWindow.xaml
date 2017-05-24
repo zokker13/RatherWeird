@@ -7,10 +7,26 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525" Loaded="Window_Loaded" Closed="Window_Closed">
     <Grid Loaded="Grid_Loaded">
-        <GroupBox x:Name="gpWindowBehavior" Header="Window Behavior" HorizontalAlignment="Left" Height="164" Margin="10,10,0,0" VerticalAlignment="Top" Width="267">
+        <GroupBox x:Name="gpWindowBehavior" Header="Window Behavior" HorizontalAlignment="Left" Height="138" Margin="10,10,0,0" VerticalAlignment="Top" Width="170">
             <Grid Margin="0,0,-2,-12">
-                <CheckBox x:Name="chLockCursor" Content="Lock Cursor" HorizontalAlignment="Left" Margin="10,31,0,0" VerticalAlignment="Top" Click="chLockCursor_Click"/>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
                 <CheckBox x:Name="chInvokeAltUp" Content="Invoke ALT UP" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="chInvokeAltUp_Click"/>
+                <CheckBox x:Name="chLockCursor" Content="Lock Cursor" HorizontalAlignment="Left" Margin="10,35,0,0" VerticalAlignment="Top" Click="chLockCursor_Click"/>
+                <CheckBox x:Name="chLaunchRa3Windowed" Content="Launch RA3 in Window" HorizontalAlignment="Left" Margin="10,58,0,0" VerticalAlignment="Top" Click="chLaunchRa3Windowed_Click"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Launch RA3" HorizontalAlignment="Left" Height="138" Margin="185,10,0,0" VerticalAlignment="Top" Width="322">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <CheckBox x:Name="chRefreshPathToRa3" Content="Refresh Path to RA3 automatically" HorizontalAlignment="Left" VerticalAlignment="Top" Click="chRefreshPathToRa3_Click" Margin="10,10,0,0"/>
+                <TextBox x:Name="txtRa3Path" HorizontalAlignment="Left" Height="23" Margin="10,15,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="290" TextChanged="txtRa3Path_TextChanged" IsEnabled="False" Grid.Row="1"/>
+                <Button x:Name="btnLaunchRa3" Content="Launch RA3" HorizontalAlignment="Left" Margin="10,1,0,0" VerticalAlignment="Top" Width="97" Cursor="" Height="34" Click="btnLaunchRa3_Click" Grid.Row="2"/>
             </Grid>
         </GroupBox>
     </Grid>

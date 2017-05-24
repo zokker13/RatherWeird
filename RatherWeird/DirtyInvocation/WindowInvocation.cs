@@ -78,11 +78,19 @@ namespace DirtyInvocation
             RECT procRect;
             GetWindowRect(process.MainWindowHandle, out procRect);
 
+            // TODO: Repair this: It seems to have a bit too much size like 1926x1102 which makes everything broken.
             int width = procRect.Right - procRect.Left;
             int height = procRect.Bottom - procRect.Top;
 
-            SetWindowPos(process.MainWindowHandle, 0, currentOccupiedScreen.Bounds.X, currentOccupiedScreen.Bounds.Y,
-                width, height, (uint)WindowSizing.SWP_FRAMECHANGED);
+            SetWindowPos(
+                process.MainWindowHandle
+                , 0
+                , currentOccupiedScreen.Bounds.X
+                , currentOccupiedScreen.Bounds.Y
+                , currentOccupiedScreen.Bounds.Width
+                , currentOccupiedScreen.Bounds.Height
+                , (uint) WindowSizing.SWP_FRAMECHANGED
+            );
         }
     }
 

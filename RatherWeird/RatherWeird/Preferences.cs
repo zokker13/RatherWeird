@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using System.Xml.Serialization;
 
 namespace RatherWeird
@@ -51,11 +52,16 @@ namespace RatherWeird
     {
         public bool LockCursor;
         public bool InvokeAltUp;
+        public bool LaunchRa3Windowed;
+        public string Ra3ExecutablePath;
+        public bool RefreshPathToRa3;
 
         public SettingEntries()
         {
             LockCursor = true;
             InvokeAltUp = true;
+            LaunchRa3Windowed = true;
+            RefreshPathToRa3 = true;
         }
     }
 
