@@ -54,8 +54,11 @@ namespace RatherWeird
             if (e.Process.ProcessName!= "ra3_1.12.game")
                 return;
 
-            WindowInvocation.DropBorder(e.Process);
-            WindowInvocation.ResizeWindow(e.Process);
+            if (settings.RemoveBorder)
+            {
+                WindowInvocation.DropBorder(e.Process);
+                WindowInvocation.ResizeWindow(e.Process);
+            }
 
             if (settings.LockCursor)
                 WindowInvocation.LockToProcess(e.Process);
@@ -72,8 +75,6 @@ namespace RatherWeird
                 );
                 txtRa3Path.Text = manualPath;
             }
-                
-            //Messaging.SendMessage(e.Process.MainWindowHandle, Messaging.WM_KEYUP, (IntPtr)0x12, IntPtr.Zero);
         }
 
         private void chLockCursor_Click(object sender, RoutedEventArgs e)
@@ -107,6 +108,7 @@ namespace RatherWeird
             chLockCursor.IsChecked = settings.LockCursor;
             chLaunchRa3Windowed.IsChecked = settings.LaunchRa3Windowed;
             chRefreshPathToRa3.IsChecked = settings.RefreshPathToRa3;
+            chRemoveBorders.IsChecked = settings.RemoveBorder;
 
             txtRa3Path.Text = GetRa3Executable();
         }
@@ -197,6 +199,12 @@ namespace RatherWeird
         {
             var adhocSender = sender as TextBox;
             settings.Ra3ExecutablePath = adhocSender?.Text;
+        }
+
+        private void chRemoveBorders_Click(object sender, RoutedEventArgs e)
+        {
+            var adhocSender = sender as CheckBox;
+            settings.RemoveBorder = adhocSender?.IsChecked == true;
         }
     }
 }
