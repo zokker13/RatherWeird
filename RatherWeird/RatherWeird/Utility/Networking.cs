@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using System.Runtime.InteropServices;
 
-namespace RatherWeird
+namespace RatherWeird.Utility
 {
-    public class Utility
+    public class Networking
     {
-        public class Networking
-        {
             [DllImport("iphlpapi.dll", SetLastError = true)]
             private static extern uint GetExtendedTcpTable(
                 IntPtr pTcpTable
@@ -161,7 +158,7 @@ namespace RatherWeird
                 MIB_TCP_STATE_DELETE_TCB = 12
             }
 
-            
+
 
             public enum TCP_TABLE_CLASS
             {
@@ -186,47 +183,48 @@ namespace RatherWeird
                 return GetTCPConnections<MIB_TCP6ROW_OWNER_PID, MIB_TCP6TABLE_OWNER_PID>((int)System.Net.Sockets.AddressFamily.InterNetworkV6);
             }
 
-            private static List<IPR> GetTCPConnections<IPR, IPT>(int ipVersion)//IPR = Row Type, IPT = Table Type
+        private static List<IPR> GetTCPConnections<IPR, IPT>(int ipVersion) //IPR = Row Type, IPT = Table Type
+        {
+            IPR[] tableRows;
+            int buffSize = 0;
+
+            var dwNumEntriesField = typeof(IPT).GetField("dwNumEntries");
+
+            // how much memory do we need?
+            uint ret = GetExtendedTcpTable(IntPtr.Zero, ref buffSize, true, ipVersion,
+                TCP_TABLE_CLASS.TCP_TABLE_OWNER_PID_ALL);
+            IntPtr tcpTablePtr = Marshal.AllocHGlobal(buffSize);
+
+            try
             {
-                IPR[] tableRows;
-                int buffSize = 0;
+                ret = GetExtendedTcpTable(tcpTablePtr, ref buffSize, true, ipVersion,
+                    TCP_TABLE_CLASS.TCP_TABLE_OWNER_PID_ALL);
+                if (ret != 0)
+                    return new List<IPR>();
 
-                var dwNumEntriesField = typeof(IPT).GetField("dwNumEntries");
+                // get the number of entries in the table
+                IPT table = (IPT) Marshal.PtrToStructure(tcpTablePtr, typeof(IPT));
+                int rowStructSize = Marshal.SizeOf(typeof(IPR));
+                uint numEntries = (uint) dwNumEntriesField.GetValue(table);
 
-                // how much memory do we need?
-                uint ret = GetExtendedTcpTable(IntPtr.Zero, ref buffSize, true, ipVersion, TCP_TABLE_CLASS.TCP_TABLE_OWNER_PID_ALL);
-                IntPtr tcpTablePtr = Marshal.AllocHGlobal(buffSize);
+                // buffer we will be returning
+                tableRows = new IPR[numEntries];
 
-                try
+                IntPtr rowPtr = (IntPtr) ((long) tcpTablePtr + 4);
+                for (int i = 0; i < numEntries; i++)
                 {
-                    ret = GetExtendedTcpTable(tcpTablePtr, ref buffSize, true, ipVersion, TCP_TABLE_CLASS.TCP_TABLE_OWNER_PID_ALL);
-                    if (ret != 0)
-                        return new List<IPR>();
-
-                    // get the number of entries in the table
-                    IPT table = (IPT)Marshal.PtrToStructure(tcpTablePtr, typeof(IPT));
-                    int rowStructSize = Marshal.SizeOf(typeof(IPR));
-                    uint numEntries = (uint)dwNumEntriesField.GetValue(table);
-
-                    // buffer we will be returning
-                    tableRows = new IPR[numEntries];
-
-                    IntPtr rowPtr = (IntPtr)((long)tcpTablePtr + 4);
-                    for (int i = 0; i < numEntries; i++)
-                    {
-                        IPR tcpRow = (IPR)Marshal.PtrToStructure(rowPtr, typeof(IPR));
-                        tableRows[i] = tcpRow;
-                        rowPtr = (IntPtr)((long)rowPtr + rowStructSize);   // next entry
-                    }
+                    IPR tcpRow = (IPR) Marshal.PtrToStructure(rowPtr, typeof(IPR));
+                    tableRows[i] = tcpRow;
+                    rowPtr = (IntPtr) ((long) rowPtr + rowStructSize); // next entry
                 }
-                finally
-                {
-                    // Free the Memory
-                    Marshal.FreeHGlobal(tcpTablePtr);
-                }
-                return tableRows != null ? tableRows.ToList() : new List<IPR>();
             }
+            finally
+            {
+                // Free the Memory
+                Marshal.FreeHGlobal(tcpTablePtr);
+            }
+            return tableRows != null ? tableRows.ToList() : new List<IPR>();
         }
-        
+
     }
 }
