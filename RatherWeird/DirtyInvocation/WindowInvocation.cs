@@ -36,6 +36,9 @@ namespace DirtyInvocation
         public static extern IntPtr SetWindowPos(IntPtr hWnd, int hWndInsertAfter, int x, int y, int cx, int cy,
             uint wFlags);
 
+        [DllImport("user32.dll")]
+        private static extern bool GetClientRect(IntPtr hWnd, out RECT lpRect);
+
         #endregion
 
         // This static method is required because legacy OSes do not support
@@ -51,13 +54,20 @@ namespace DirtyInvocation
 
         public static void LockToProcess(Process process)
         {
-            long style = GetWindowLong(process.MainModule.BaseAddress, (int)GwlIndex.GWL_STYLE);
-            Console.WriteLine($"Style: {style}");
+            RECT windowRect, clientRect;
+            GetWindowRect(process.MainWindowHandle, out windowRect);
+            GetClientRect(process.MainWindowHandle, out clientRect);
 
-            RECT procRect;
-            GetWindowRect(process.MainWindowHandle, out procRect);
+            int borderThickness = ((windowRect.Right - windowRect.Left) - clientRect.Right) / 2;
+            int topBorderThickness = (windowRect.Bottom - windowRect.Top) - clientRect.Bottom;
 
-            ClipCursor(ref procRect);
+            RECT lockPosition;
+            lockPosition.Left = windowRect.Left + borderThickness;
+            lockPosition.Right = clientRect.Right + windowRect.Left + borderThickness;
+            lockPosition.Top = windowRect.Top + topBorderThickness - borderThickness; 
+            lockPosition.Bottom = clientRect.Bottom + windowRect.Top + topBorderThickness - borderThickness;
+
+            ClipCursor(ref lockPosition);
 
         }
 
