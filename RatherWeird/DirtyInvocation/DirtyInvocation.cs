@@ -10,8 +10,10 @@ namespace DirtyInvocation
 {
     public static class Messaging
     {
+        // LPARAM = unsigned int
+        // WPARAM = long
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = false)]
-        public static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
+        public static extern IntPtr SendMessage(IntPtr hWnd, int msg, uint wParam, long lParam);
         
         [Flags]
         public enum WM
@@ -25,7 +27,15 @@ namespace DirtyInvocation
             RButtonUp = 0x0205,
         };
 
-        public static IntPtr InvokeKeyPress(IntPtr handle, int key)
+        public static IntPtr SimulateAltKeyPress(IntPtr handle)
+        {
+            SendMessage(handle, (int)WM.SyskeyDown, 0x12, 0x20380001);
+            SendMessage(handle, (int)WM.SyskeyUp, 0x12, 0xC0380001);
+
+            return IntPtr.Zero;
+        }
+
+        public static IntPtr InvokeKeyPress(IntPtr handle, uint key)
         {
             InvokeKeyDown(handle, key);
             InvokeKeyUp(handle, key);
@@ -33,25 +43,42 @@ namespace DirtyInvocation
             return IntPtr.Zero;
         }
 
-        public static IntPtr InvokeKeyDown(IntPtr handle, int key)
+        public static IntPtr InvokeKeyDown(IntPtr handle, uint key)
         {
-            return SendMessage(handle, (int)WM.KeyDown, (IntPtr)key, IntPtr.Zero);
+            return SendMessage(handle, (int)WM.KeyDown, key, 0);
         }
 
-        public static IntPtr InvokeKeyUp(IntPtr handle, int key)
+        public static IntPtr InvokeKeyUp(IntPtr handle, uint key)
         {
-            return SendMessage(handle, (int)WM.KeyUp, (IntPtr)key, IntPtr.Zero);
+            return SendMessage(handle, (int)WM.KeyUp, key, 0);
         }
 
+        public static IntPtr InvokeSysKeyPress(IntPtr handle, uint key)
+        {
+            InvokeSysKeyDown(handle, key);
+            InvokeSysKeyUp(handle, key);
+
+            return IntPtr.Zero;
+        }
+
+        public static IntPtr InvokeSysKeyDown(IntPtr handle, uint key)
+        {
+            return SendMessage(handle, (int)WM.SyskeyDown, key, 1);
+        }
+
+        public static IntPtr InvokeSysKeyUp(IntPtr handle, uint key)
+        {
+            return SendMessage(handle, (int)WM.SyskeyUp, key, 1);
+        }
 
         public static IntPtr InvokeMouse(IntPtr handle, int msg, uint x, uint y)
         {
-            return SendMessage(handle, msg, IntPtr.Zero, MakeLParam(x, y));
+            return SendMessage(handle, msg, 0, MakeLParam(x, y));
         }
 
-        private static IntPtr MakeLParam(uint x, uint y)
+        private static uint MakeLParam(uint x, uint y)
         {
-            return (IntPtr)((y << 16) | (x & 0xffff));
+            return (y << 16) | (x & 0xffff);
         }
     }
 }

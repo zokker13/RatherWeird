@@ -11,13 +11,17 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
+using System.Windows.Threading;
 using WindowHook;
 using DirtyInvocation;
 using Microsoft.Win32;
+using CheckBox = System.Windows.Controls.CheckBox;
+using TextBox = System.Windows.Controls.TextBox;
 
 namespace RatherWeird
 {
@@ -32,7 +36,7 @@ namespace RatherWeird
 
         public MainWindow()
         {
-            InitializeComponent();   
+            InitializeComponent();
         }
 
         private void ForegroundWatcher_ForegroundChanged(object sender, ForegroundArgs e)
@@ -40,6 +44,9 @@ namespace RatherWeird
             if (e.Process.ProcessName!= "ra3_1.12.game")
                 return;
 
+            latestRa3 = e.Process;
+
+            
             if (settings.RemoveBorder)
             {
                 WindowInvocation.DropBorder(e.Process);
@@ -48,9 +55,17 @@ namespace RatherWeird
 
             if (settings.LockCursor)
                 WindowInvocation.LockToProcess(e.Process);
-            
+
             if (settings.InvokeAltUp)
-                Messaging.InvokeKeyUp(e.Process.MainWindowHandle, 0x12);    // ALT key
+            {
+                Task.Delay(100).ContinueWith(_ =>
+                {
+                    Messaging.SimulateAltKeyPress(e.Process.MainWindowHandle);
+                    // Messaging.InvokeSysKeyPress(e.Process.MainWindowHandle, (uint) Keys.Menu);
+                    // Messaging.InvokeSysKeyPress(e.Process.MainWindowHandle, (int)Keys.Menu); // ALT key
+                });
+
+            }
 
             if (settings.RefreshPathToRa3)
             {
@@ -75,6 +90,8 @@ namespace RatherWeird
             settings.InvokeAltUp = adhocSender?.IsChecked == true;
         }
 
+        private Process latestRa3 = null;
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             settings = Preferences.Load();
@@ -84,6 +101,25 @@ namespace RatherWeird
             _keyboardWatcher.HookKeyboard();
 
             _foregroundWatcher.ForegroundChanged += ForegroundWatcher_ForegroundChanged;
+
+            DispatcherTimer tmr = new DispatcherTimer();
+            tmr.Tick += Tmr_Tick;
+            tmr.Interval = new TimeSpan(0, 0, 0, 1);
+            tmr.Start();
+        }
+
+        private void Tmr_Tick(object sender, EventArgs e)
+        {
+            if (latestRa3 == null)
+                return;
+
+            var ra3Connections = Utility.Networking.GetAllTCPConnections()
+                .Where(connection => connection.owningPid == latestRa3.Id);
+
+            foreach (var mibTcprowOwnerPid in ra3Connections)
+            {
+                Console.WriteLine(mibTcprowOwnerPid.RemoteAddress.ToString());
+            }
         }
 
         private void Window_Closed(object sender, EventArgs e)
