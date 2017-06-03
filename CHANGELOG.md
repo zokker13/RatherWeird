@@ -1,6 +1,6 @@
 # RatherWeird Changelog
 
-## ??
+## 0.2.0 [2017-06-03]
 ### Stuff Fixed
 * [[`c85a6d21`](https://github.com/zokker13/RatherWeird/commit/c85a6d21052386bb3a44eb3f2d583c66f5a14935)] - Make [ALT UP] actually work (it seemed to not work - I now invoke it exactly as the game does and added a tiny timeout of 100ms)
 
