@@ -1,12 +1,12 @@
 # RatherWeird Changelog
 
-## ??
+## 0.2.0 [2017-06-03]
 ### Stuff Fixed
-* [[`c85a6d21`](https://github.com/zokker13/RatherWeird/commit/c85a6d21052386bb3a44eb3f2d583c66f5a14935)] - Make [ALT UP] actually work (it seemed to not work - I now invoke it exactly as the game does and added a tiny timeout of 100ms)
+* Make [ALT UP] actually work (it seemed to not work - I now invoke it exactly as the game does and added a tiny timeout of 100ms) [c85a6d21](https://github.com/zokker13/RatherWeird/commit/c85a6d21052386bb3a44eb3f2d583c66f5a14935)
 
 ### Stuff Added
-* [[`48391be2`](https://github.com/zokker13/RatherWeird/commit/48391be29f471609d4875dccb63160db484ce07a)] - Hook [Numpad ENTER] and invoke the normal [ENTER]. RA3 won't allow the use of the [Numpad ENTER].
-* [[`0d2a0bf6`](https://github.com/zokker13/RatherWeird/commit/0d2a0bf6e413219758218f9dd813aa75f59a4dd5)] - The Lock Cursor feature now worls with windows with borders EXCLUDING the borders.
+* Hook [Numpad ENTER] and invoke the normal [ENTER]. RA3 won't allow the use of the [Numpad ENTER]. [48391be2](https://github.com/zokker13/RatherWeird/commit/48391be29f471609d4875dccb63160db484ce07a)
+* The Lock Cursor feature now worls with windows with borders EXCLUDING the borders. [0d2a0bf6](https://github.com/zokker13/RatherWeird/commit/0d2a0bf6e413219758218f9dd813aa75f59a4dd5)
 
 ## 0.1.0
 ### Stuff Added
