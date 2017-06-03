@@ -111,7 +111,6 @@ namespace RatherWeird
 
         private void _keyboardWatcher_KeyboardInputChanged(object sender, KeyboardInputArgs e)
         {
-
             if (settings.HookNumpadEnter == false)
                 return;
 
@@ -124,7 +123,9 @@ namespace RatherWeird
             if (e.KeyboardMessage == WM.KeyDown
                 && (e.Flags & 1) == 1)
             {
-                InvokeEnter(latestRa3.MainWindowHandle);
+
+                if (latestRa3 != null)
+                    InvokeEnter(latestRa3.MainWindowHandle);
             }
         }
 
