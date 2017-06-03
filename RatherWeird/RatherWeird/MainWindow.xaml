@@ -19,6 +19,7 @@
                 <CheckBox x:Name="chLockCursor" Content="Lock Cursor" HorizontalAlignment="Left" Margin="10,31,0,0" VerticalAlignment="Top" Click="chLockCursor_Click"/>
                 <CheckBox x:Name="chLaunchRa3Windowed" Content="Launch RA3 in Window" HorizontalAlignment="Left" Margin="10,52,0,0" VerticalAlignment="Top" Click="chLaunchRa3Windowed_Click"/>
                 <CheckBox x:Name="chRemoveBorders" Content="Remove Borders" HorizontalAlignment="Left" Margin="10,73,0,-5" VerticalAlignment="Top" Click="chRemoveBorders_Click"/>
+                <CheckBox x:Name="chHookNumpadEnter" Content="Hook Numpad Enter" HorizontalAlignment="Left" Margin="10,94,0,-7" VerticalAlignment="Top" Click="chHookNumpadEnter_Click"/>
             </Grid>
         </GroupBox>
         <GroupBox Header="Launch RA3" Margin="185,10,0,0" Height="138" VerticalAlignment="Top" HorizontalAlignment="Left" Width="322">

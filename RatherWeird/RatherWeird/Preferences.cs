@@ -56,6 +56,7 @@ namespace RatherWeird
         public bool LaunchRa3Windowed;
         public string Ra3ExecutablePath;
         public bool RefreshPathToRa3;
+        public bool HookNumpadEnter;
 
         public SettingEntries()
         {
@@ -64,6 +65,7 @@ namespace RatherWeird
             LaunchRa3Windowed = true;
             RefreshPathToRa3 = true;
             RemoveBorder = true;
+            HookNumpadEnter = true;
         }
     }
 

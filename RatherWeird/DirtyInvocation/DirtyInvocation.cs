@@ -20,6 +20,7 @@ namespace DirtyInvocation
         {
             KeyDown= 0x0100,
             KeyUp = 0x0101,
+            Char = 0x0102,
             SyskeyDown= 0x0104,
             SyskeyUp = 0x0105,
             MouseMove = 0x0200,

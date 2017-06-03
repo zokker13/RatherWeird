@@ -32,6 +32,7 @@ namespace RatherWeird
     {
         private readonly ForegroundWatcher _foregroundWatcher = new ForegroundWatcher();
         private readonly KeyboardWatcher _keyboardWatcher = new KeyboardWatcher();
+        
         private SettingEntries settings;
 
         public MainWindow()
@@ -45,7 +46,6 @@ namespace RatherWeird
                 return;
 
             latestRa3 = e.Process;
-
             
             if (settings.RemoveBorder)
             {
@@ -101,11 +101,31 @@ namespace RatherWeird
             _keyboardWatcher.HookKeyboard();
 
             _foregroundWatcher.ForegroundChanged += ForegroundWatcher_ForegroundChanged;
+            _keyboardWatcher.KeyboardInputChanged += _keyboardWatcher_KeyboardInputChanged;
 
             DispatcherTimer tmr = new DispatcherTimer();
             tmr.Tick += Tmr_Tick;
             tmr.Interval = new TimeSpan(0, 0, 0, 1);
             tmr.Start();
+        }
+
+        private void _keyboardWatcher_KeyboardInputChanged(object sender, KeyboardInputArgs e)
+        {
+
+            if (settings.HookNumpadEnter == false)
+                return;
+
+            // Manual filter..
+            if (e.Key != Keys.Enter)
+                return;
+
+            // Check for first bit which tells that this key is extended:
+            // Ref.: https://msdn.microsoft.com/en-us/library/windows/desktop/ms644967(v=vs.85).aspx
+            if (e.KeyboardMessage == WM.KeyDown
+                && (e.Flags & 1) == 1)
+            {
+                InvokeEnter(latestRa3.MainWindowHandle);
+            }
         }
 
         private void Tmr_Tick(object sender, EventArgs e)
@@ -137,6 +157,7 @@ namespace RatherWeird
             chLaunchRa3Windowed.IsChecked = settings.LaunchRa3Windowed;
             chRefreshPathToRa3.IsChecked = settings.RefreshPathToRa3;
             chRemoveBorders.IsChecked = settings.RemoveBorder;
+            chHookNumpadEnter.IsChecked = settings.HookNumpadEnter;
 
             txtRa3Path.Text = GetRa3Executable();
         }
@@ -219,6 +240,24 @@ namespace RatherWeird
         {
             var adhocSender = sender as CheckBox;
             settings.RemoveBorder = adhocSender?.IsChecked == true;
+        }
+
+        private void InvokeEnter(IntPtr handle)
+        {
+            // The following describes the lPARAM for KEYDOWN:
+            // https://msdn.microsoft.com/en-us/library/windows/desktop/ms646280(v=vs.85).aspx
+            // lParam needs to have it's OEM value set (probnably 00011100, I didn't change it) and extended type to 0.
+            // I copied the the repeat of 1.
+            Messaging.SendMessage(handle, (int)Messaging.WM.KeyDown, (uint)Keys.Enter, 0x1C0001);
+            Messaging.SendMessage(handle, (int)Messaging.WM.Char, (uint)Keys.Enter, 0x1C0001);
+            Messaging.SendMessage(handle, (int)Messaging.WM.KeyUp, (uint)Keys.Enter, 0xC01C0001);
+        }
+        
+
+        private void chHookNumpadEnter_Click(object sender, RoutedEventArgs e)
+        {
+            var adhocSender = sender as CheckBox;
+            settings.HookNumpadEnter = adhocSender?.IsChecked == true;
         }
     }
 }
