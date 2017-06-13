@@ -220,15 +220,18 @@ namespace RatherWeird
 
         private void btnLaunchRa3_Click(object sender, RoutedEventArgs e)
         {
-            string pathToRa3 = GetRa3Executable();
-            if (pathToRa3 == "")
-                return; // TODO: Call message!?
+            Task.Run(() =>
+            {
+                string pathToRa3 = GetRa3Executable();
+                if (pathToRa3 == "")
+                    return; // TODO: Call message!?
 
-            string arguments = settings.LaunchRa3Windowed
-                ? " -win"
-                : "";
+                string arguments = settings.LaunchRa3Windowed
+                    ? " -win"
+                    : "";
 
-            Process.Start(pathToRa3, arguments);
+                Process.Start(pathToRa3, arguments);
+            });
         }
 
         private void txtRa3Path_TextChanged(object sender, TextChangedEventArgs e)
