@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RatherWeird"
         mc:Ignorable="d"
-        Title="RatherWeird" Height="197" Width="534" Loaded="Window_Loaded" Closed="Window_Closed" ResizeMode="CanMinimize">
+        Title="RatherWeird" Height="197" Width="534" Loaded="Window_Loaded" Closed="Window_Closed" ResizeMode="CanMinimize" Icon="dunno_man.ico">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
