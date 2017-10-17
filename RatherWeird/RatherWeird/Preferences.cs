@@ -14,12 +14,12 @@ namespace RatherWeird
         public static SettingEntries Load()
         {
             SettingEntries settings = new SettingEntries();
-            
+
             if (!File.Exists(Constants.SettingsFile))
                 return settings;
 
             XmlSerializer serial = new XmlSerializer(settings.GetType());
-            settings = (SettingEntries) serial.Deserialize(new StreamReader(Constants.SettingsFile));
+            settings = (SettingEntries)serial.Deserialize(new StreamReader(Constants.SettingsFile));
 
             return settings;
         }
@@ -50,22 +50,46 @@ namespace RatherWeird
 
     public class SettingEntries
     {
+        private MainWindow context;
+
         public bool LockCursor;
         public bool InvokeAltUp;
         public bool RemoveBorder;
         public bool LaunchRa3Windowed;
         public string Ra3ExecutablePath;
         public bool RefreshPathToRa3;
-        public bool HookNumpadEnter;
+        public bool HookNumpadEnter
+        {
+            get
+            {
+                return hookNumpadEnter;
+            }
+            set
+            {
+                if (context!=null)
+                {
+                    context.OnKeyboardHookStatusChange(value);
+                    hookNumpadEnter = value;
+                }
+            }
+        }
+        private bool hookNumpadEnter;
 
         public SettingEntries()
         {
+            context = null;
+
             LockCursor = true;
             InvokeAltUp = true;
             LaunchRa3Windowed = true;
             RefreshPathToRa3 = true;
             RemoveBorder = true;
             HookNumpadEnter = true;
+        }
+
+        public void SetContext(MainWindow context)
+        {
+            this.context = context;
         }
     }
 

@@ -117,9 +117,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="smug.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\smug.png" />
   </ItemGroup>
   <ItemGroup>
