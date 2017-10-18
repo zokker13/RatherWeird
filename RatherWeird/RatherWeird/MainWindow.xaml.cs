@@ -47,16 +47,17 @@ namespace RatherWeird
             if (e.Process.ProcessName != "ra3_1.12.game")
                 return;
 
+            Log("RA3 Window found");
             latestRa3 = e.Process;
 
             if (settings.RemoveBorder)
             {
-                WindowInvocation.DropBorder(e.Process);
-                WindowInvocation.ResizeWindow(e.Process);
+                if (!WindowInvocation.DropBorder(e.Process)) Log("Remove Window Border failed.");
+                if (!WindowInvocation.ResizeWindow(e.Process)) Log("Resize Window failed.");
             }
 
             if (settings.LockCursor)
-                WindowInvocation.LockToProcess(e.Process);
+                WindowInvocation.ClipCursor(e.Process);
 
             if (settings.InvokeAltUp)
             {
@@ -137,7 +138,7 @@ namespace RatherWeird
                     InvokeEnter(latestRa3.MainWindowHandle);
             }
         }
-        
+
         private void ListConnectionsTmr_Tick(object sender, EventArgs e)
         {
             if (latestRa3 == null)
@@ -146,7 +147,7 @@ namespace RatherWeird
             lstConn.ItemsSource =
                 Utility.Networking.GetAllTCPConnections()
                 .Where(connection => connection.owningPid == latestRa3.Id)
-                .Select(connection=>String.Format("{0}:{1}",connection.RemoteAddress,connection.RemotePort));
+                .Select(connection => String.Format("{0}:{1}", connection.RemoteAddress, connection.RemotePort));
 
             /*
             foreach (var mibTcprowOwnerPid in ra3Connections)
@@ -296,7 +297,7 @@ namespace RatherWeird
         private void chkConn_Click(object sender, RoutedEventArgs e)
         {
             var adhocSender = sender as CheckBox;
-            if(adhocSender?.IsChecked == true)
+            if (adhocSender?.IsChecked == true)
             {
                 listConnectionsTmr.Start();
             }
@@ -312,8 +313,8 @@ namespace RatherWeird
         {
             if (value)
             {
-                Log(_keyboardWatcher.HookKeyboard()?
-                    "KeyboardWatcher started.":
+                Log(_keyboardWatcher.HookKeyboard() ?
+                    "KeyboardWatcher started." :
                     "KeyboardWatcher failed.");
             }
             else

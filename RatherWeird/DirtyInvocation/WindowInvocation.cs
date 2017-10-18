@@ -39,20 +39,24 @@ namespace DirtyInvocation
         [DllImport("user32.dll")]
         private static extern bool GetClientRect(IntPtr hWnd, out RECT lpRect);
 
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern void SetLastError(uint dwErrorCode);
+
         #endregion
 
         // This static method is required because legacy OSes do not support
         // SetWindowLongPtr
         public static IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, long dwNewLong)
         {
+            SetLastError(0);
             if (IntPtr.Size == 8)
                 return SetWindowLongPtr64(hWnd, nIndex, dwNewLong);
-            
+
             return new IntPtr(SetWindowLong32(hWnd, nIndex, (int)dwNewLong));
         }
 
 
-        public static void LockToProcess(Process process)
+        public static void ClipCursor(Process process)
         {
             RECT windowRect, clientRect;
             GetWindowRect(process.MainWindowHandle, out windowRect);
@@ -64,24 +68,26 @@ namespace DirtyInvocation
             RECT lockPosition;
             lockPosition.Left = windowRect.Left + borderThickness;
             lockPosition.Right = clientRect.Right + windowRect.Left + borderThickness;
-            lockPosition.Top = windowRect.Top + topBorderThickness - borderThickness; 
+            lockPosition.Top = windowRect.Top + topBorderThickness - borderThickness;
             lockPosition.Bottom = clientRect.Bottom + windowRect.Top + topBorderThickness - borderThickness;
 
             ClipCursor(ref lockPosition);
 
         }
 
-        public static void DropBorder(Process process)
+        public static bool DropBorder(Process process)
         {
             long style = GetWindowLong(process.MainWindowHandle, (int)GwlIndex.GWL_STYLE);
 
-            style &= ~((long) WindowStyles.WS_CAPTION | (long) WindowStyles.WS_MAXIMIZE | (long) WindowStyles.WS_MINIMIZE |
-                       (long) WindowStyles.WS_SYSMENU);
+            style &= ~((long)WindowStyles.WS_CAPTION | (long)WindowStyles.WS_MAXIMIZE | (long)WindowStyles.WS_MINIMIZE |
+                       (long)WindowStyles.WS_SYSMENU);
 
-            SetWindowLongPtr(process.MainWindowHandle, (int) GwlIndex.GWL_STYLE, style);
+
+            SetWindowLongPtr(process.MainWindowHandle, (int)GwlIndex.GWL_STYLE, style);
+            return Marshal.GetLastWin32Error() == 0;
         }
 
-        public static void ResizeWindow(Process process)
+        public static bool ResizeWindow(Process process)
         {
             // TODO: Drop this reference to winforms and PInvoke it?
             Screen currentOccupiedScreen = Screen.FromHandle(process.MainWindowHandle);
@@ -92,15 +98,15 @@ namespace DirtyInvocation
             int width = procRect.Right - procRect.Left;
             int height = procRect.Bottom - procRect.Top;
 
-            SetWindowPos(
+            return SetWindowPos(
                 process.MainWindowHandle
                 , 0
                 , currentOccupiedScreen.Bounds.X
                 , currentOccupiedScreen.Bounds.Y
                 , currentOccupiedScreen.Bounds.Width
                 , currentOccupiedScreen.Bounds.Height
-                , (uint) WindowSizing.SWP_FRAMECHANGED
-            );
+                , (uint)WindowSizing.SWP_FRAMECHANGED
+            ) != IntPtr.Zero;
         }
     }
 
@@ -125,7 +131,7 @@ namespace DirtyInvocation
         WS_BORDER = 0x00800000L,
         WS_MINIMIZE = 0x20000000,
         WS_MAXIMIZE = 0x01000000,
-        WS_CAPTION = 0x00C00000,    
+        WS_CAPTION = 0x00C00000,
         WS_SYSMENU = 0x00080000,
         WS_THICKFRAME = 0x00040000,
         WS_MINIMIZEBOX = 0x00020000,
@@ -153,7 +159,7 @@ namespace DirtyInvocation
         /// Bottom position of the rectangle.
         /// </summary>
         public int Bottom;
-        
+
         #endregion
 
         #region Constructor.

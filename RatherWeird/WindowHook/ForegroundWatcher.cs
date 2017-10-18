@@ -74,7 +74,7 @@ namespace WindowHook
                 , WINEVENT_OUTOFCONTEXT
             );
 
-            return WndHook == IntPtr.Zero;
+            return WndHook != IntPtr.Zero;
         }
        
         public void Unhook()
