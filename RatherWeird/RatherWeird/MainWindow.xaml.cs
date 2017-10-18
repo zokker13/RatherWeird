@@ -22,6 +22,7 @@ using DirtyInvocation;
 using Microsoft.Win32;
 using CheckBox = System.Windows.Controls.CheckBox;
 using TextBox = System.Windows.Controls.TextBox;
+using System.Collections.ObjectModel;
 
 namespace RatherWeird
 {
@@ -32,29 +33,31 @@ namespace RatherWeird
     {
         private readonly ForegroundWatcher _foregroundWatcher = new ForegroundWatcher();
         private readonly KeyboardWatcher _keyboardWatcher = new KeyboardWatcher();
-        
+
         private SettingEntries settings;
 
         public MainWindow()
         {
             InitializeComponent();
+            this.DataContext = this;
         }
 
         private void ForegroundWatcher_ForegroundChanged(object sender, ForegroundArgs e)
         {
-            if (e.Process.ProcessName!= "ra3_1.12.game")
+            if (e.Process.ProcessName != "ra3_1.12.game")
                 return;
 
+            Log("RA3 Window found");
             latestRa3 = e.Process;
-            
+
             if (settings.RemoveBorder)
             {
-                WindowInvocation.DropBorder(e.Process);
-                WindowInvocation.ResizeWindow(e.Process);
+                if (!WindowInvocation.DropBorder(e.Process)) Log("Remove Window Border failed.");
+                if (!WindowInvocation.ResizeWindow(e.Process)) Log("Resize Window failed.");
             }
 
             if (settings.LockCursor)
-                WindowInvocation.LockToProcess(e.Process);
+                WindowInvocation.ClipCursor(e.Process);
 
             if (settings.InvokeAltUp)
             {
@@ -92,21 +95,28 @@ namespace RatherWeird
 
         private Process latestRa3 = null;
 
+        private DispatcherTimer listConnectionsTmr;
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             settings = Preferences.Load();
+            settings.SetContext(this);
             SetupControls();
 
-            _foregroundWatcher.HookForeground();
-            _keyboardWatcher.HookKeyboard();
+            if (_foregroundWatcher.HookForeground())
+            {
+                Log("ForegroundWatcher started. Waiting for RA3 game window...");
+            }
+            else
+            {
+                Log("ForegroundWatcher failed.");
+            }
 
             _foregroundWatcher.ForegroundChanged += ForegroundWatcher_ForegroundChanged;
             _keyboardWatcher.KeyboardInputChanged += _keyboardWatcher_KeyboardInputChanged;
 
-            DispatcherTimer tmr = new DispatcherTimer();
-            tmr.Tick += Tmr_Tick;
-            tmr.Interval = new TimeSpan(0, 0, 0, 1);
-            tmr.Start();
+            listConnectionsTmr = new DispatcherTimer();
+            listConnectionsTmr.Tick += ListConnectionsTmr_Tick;
+            listConnectionsTmr.Interval = new TimeSpan(0, 0, 0, 1);
         }
 
         private void _keyboardWatcher_KeyboardInputChanged(object sender, KeyboardInputArgs e)
@@ -129,18 +139,22 @@ namespace RatherWeird
             }
         }
 
-        private void Tmr_Tick(object sender, EventArgs e)
+        private void ListConnectionsTmr_Tick(object sender, EventArgs e)
         {
             if (latestRa3 == null)
                 return;
 
-            var ra3Connections = Utility.Networking.GetAllTCPConnections()
-                .Where(connection => connection.owningPid == latestRa3.Id);
+            lstConn.ItemsSource =
+                Utility.Networking.GetAllTCPConnections()
+                .Where(connection => connection.owningPid == latestRa3.Id)
+                .Select(connection => String.Format("{0}:{1}", connection.RemoteAddress, connection.RemotePort));
 
+            /*
             foreach (var mibTcprowOwnerPid in ra3Connections)
             {
                 Console.WriteLine(mibTcprowOwnerPid.RemoteAddress.ToString());
             }
+            */
         }
 
         private void Window_Closed(object sender, EventArgs e)
@@ -186,7 +200,7 @@ namespace RatherWeird
             string pathToRa3 = "";
             try
             {
-                pathToRa3 = (string) Registry.GetValue(
+                pathToRa3 = (string)Registry.GetValue(
                     @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RA3.exe"
                     , null
                     , null
@@ -194,7 +208,7 @@ namespace RatherWeird
             }
             catch (Exception)
             {
-                // TODO: Report..?
+                Log("Failed to load RA3 path from registry. Please manually run the game once for me to get it.");
             }
 
             return pathToRa3;
@@ -224,7 +238,10 @@ namespace RatherWeird
             {
                 string pathToRa3 = GetRa3Executable();
                 if (pathToRa3 == "")
-                    return; // TODO: Call message!?
+                {
+                    Log("No RA3 path. Please manually run the game once.");
+                    return;
+                }
 
                 string arguments = settings.LaunchRa3Windowed
                     ? " -win"
@@ -256,12 +273,55 @@ namespace RatherWeird
             Messaging.SendMessage(handle, (int)Messaging.WM.Char, (uint)Keys.Enter, 0x1C0001);
             Messaging.SendMessage(handle, (int)Messaging.WM.KeyUp, (uint)Keys.Enter, 0xC01C0001);
         }
-        
+
 
         private void chHookNumpadEnter_Click(object sender, RoutedEventArgs e)
         {
             var adhocSender = sender as CheckBox;
             settings.HookNumpadEnter = adhocSender?.IsChecked == true;
+        }
+
+        private void Log(string log)
+        {
+            if (this.Dispatcher.CheckAccess())
+            {
+                this.txtLog.AppendText(log + "\n");
+                this.txtLog.ScrollToEnd();
+            }
+            else
+            {
+                this.Dispatcher.Invoke(() => Log(log));
+            }
+        }
+
+        private void chkConn_Click(object sender, RoutedEventArgs e)
+        {
+            var adhocSender = sender as CheckBox;
+            if (adhocSender?.IsChecked == true)
+            {
+                listConnectionsTmr.Start();
+            }
+            else
+            {
+                listConnectionsTmr.Stop();
+                //TODO: Think carefully whether to clear the list. Lol JK. 
+                //lstConn.ItemsSource = null;
+            }
+        }
+
+        public void OnKeyboardHookStatusChange(bool value)
+        {
+            if (value)
+            {
+                Log(_keyboardWatcher.HookKeyboard() ?
+                    "KeyboardWatcher started." :
+                    "KeyboardWatcher failed.");
+            }
+            else
+            {
+                _keyboardWatcher.UnhookKeyboard();
+                Log("KeyboardWatcher stopped.");
+            }
         }
     }
 }

@@ -50,7 +50,7 @@ namespace WindowHook
             , uint dwmsEventTime
             );
 
-        public void HookForeground()
+        public bool HookForeground()
         {
             _del = (hWinEventHook, eventType, hwnd, idObject, idChild, dwEventThread, dwmsEventTime) =>
             {
@@ -73,6 +73,8 @@ namespace WindowHook
                 , 0
                 , WINEVENT_OUTOFCONTEXT
             );
+
+            return WndHook != IntPtr.Zero;
         }
        
         public void Unhook()
