@@ -57,6 +57,7 @@ namespace RatherWeird
         public string Ra3ExecutablePath;
         public bool RefreshPathToRa3;
         public bool HookNumpadEnter;
+        public bool SwapHealthbarLogic;
 
         public SettingEntries()
         {
@@ -66,6 +67,7 @@ namespace RatherWeird
             RefreshPathToRa3 = true;
             RemoveBorder = true;
             HookNumpadEnter = true;
+            SwapHealthbarLogic = false;
         }
     }
 

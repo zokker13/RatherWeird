@@ -20,6 +20,7 @@ using System.Windows.Threading;
 using WindowHook;
 using DirtyInvocation;
 using Microsoft.Win32;
+using RatherWeird.Utility;
 using CheckBox = System.Windows.Controls.CheckBox;
 using TextBox = System.Windows.Controls.TextBox;
 
@@ -32,6 +33,8 @@ namespace RatherWeird
     {
         private readonly ForegroundWatcher _foregroundWatcher = new ForegroundWatcher();
         private readonly KeyboardWatcher _keyboardWatcher = new KeyboardWatcher();
+        private readonly MemoryManipulator _memoryManipulator = new MemoryManipulator();
+        private readonly Ra3ProcessWatcher _ra3Watcher = new Ra3ProcessWatcher();
         
         private SettingEntries settings;
 
@@ -102,11 +105,24 @@ namespace RatherWeird
 
             _foregroundWatcher.ForegroundChanged += ForegroundWatcher_ForegroundChanged;
             _keyboardWatcher.KeyboardInputChanged += _keyboardWatcher_KeyboardInputChanged;
+            _ra3Watcher.Ra3ProcessChanged += Ra3WatcherOnRa3ProcessChanged;
 
             DispatcherTimer tmr = new DispatcherTimer();
             tmr.Tick += Tmr_Tick;
             tmr.Interval = new TimeSpan(0, 0, 0, 1);
             tmr.Start();
+        }
+
+        private void Ra3WatcherOnRa3ProcessChanged(object sender, Ra3ProcessArgs ra3ProcessArgs)
+        {
+            _memoryManipulator.LockProcess();
+
+            if (ra3ProcessArgs.State == ProcessState.Started)
+            {
+                UnlockRa3Process(ra3ProcessArgs.ProcessId);
+                SwapHealthbarLogic();
+            }
+            
         }
 
         private void _keyboardWatcher_KeyboardInputChanged(object sender, KeyboardInputArgs e)
@@ -147,6 +163,8 @@ namespace RatherWeird
         {
             _foregroundWatcher.Unhook();
             _keyboardWatcher.UnhookKeyboard();
+            _memoryManipulator.LockProcess();
+            _ra3Watcher.Stop();
 
             Preferences.Write(settings);
         }
@@ -159,6 +177,7 @@ namespace RatherWeird
             chRefreshPathToRa3.IsChecked = settings.RefreshPathToRa3;
             chRemoveBorders.IsChecked = settings.RemoveBorder;
             chHookNumpadEnter.IsChecked = settings.HookNumpadEnter;
+            chSwapHealthbarLogic.IsChecked = settings.SwapHealthbarLogic;
 
             txtRa3Path.Text = GetRa3Executable();
         }
@@ -262,6 +281,37 @@ namespace RatherWeird
         {
             var adhocSender = sender as CheckBox;
             settings.HookNumpadEnter = adhocSender?.IsChecked == true;
+        }
+
+        private void chSwapHealthbarLogic_Click(object sender, RoutedEventArgs e)
+        {
+            var adhocSender = sender as CheckBox;
+            settings.SwapHealthbarLogic = adhocSender?.IsChecked == true;
+
+            SwapHealthbarLogic();
+        }
+
+        private Process FindRa3Process()
+        {
+            // Probably only possible to have one of these since Ra3 takes care of only being available once..
+            Process[] ra3Procs = Process.GetProcessesByName("ra3_1.12.game");
+            
+            return ra3Procs.Length <= 0 ? null : ra3Procs[0];
+        }
+
+        private void SwapHealthbarLogic()
+        {
+            byte byteToWrite = settings.SwapHealthbarLogic ? (byte)117 : (byte)116;
+            _memoryManipulator.WriteByte((IntPtr)0x0052EB93, byteToWrite);
+        }
+
+        private bool UnlockRa3Process(int processId)
+        {
+            int properProcessId = processId == -1 ? FindRa3Process().Id : processId;
+
+            return _memoryManipulator.UnlockProcess(properProcessId,
+                MemoryManipulator.ProcessAccessFlags.VirtualMemoryWrite |
+                MemoryManipulator.ProcessAccessFlags.VirtualMemoryOperation, true);
         }
     }
 }
