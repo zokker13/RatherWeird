@@ -34,8 +34,29 @@ namespace RatherWeird
         private readonly ForegroundWatcher _foregroundWatcher = new ForegroundWatcher();
         private readonly KeyboardWatcher _keyboardWatcher = new KeyboardWatcher();
         private readonly MemoryManipulator _memoryManipulator = new MemoryManipulator();
-        private readonly Ra3ProcessWatcher _ra3Watcher = new Ra3ProcessWatcher();
-        
+
+        private Process _latestRa3 = null;
+
+        private Process LatestRa3
+        {
+            get { return _latestRa3; }
+            set
+            {
+                if (value.Id != _latestRa3?.Id)
+                {
+                    _latestRa3 = value;
+
+                    _memoryManipulator.LockProcess();
+
+                    _memoryManipulator.UnlockProcess(LatestRa3,
+                        MemoryManipulator.ProcessAccessFlags.All |
+                        MemoryManipulator.ProcessAccessFlags.VirtualMemoryOperation);
+
+                    SwapHealthbarLogic();
+                }
+            }
+        }
+
         private SettingEntries settings;
 
         public MainWindow()
@@ -48,7 +69,7 @@ namespace RatherWeird
             if (e.Process.ProcessName!= "ra3_1.12.game")
                 return;
 
-            latestRa3 = e.Process;
+            LatestRa3 = e.Process;
             
             if (settings.RemoveBorder)
             {
@@ -93,7 +114,7 @@ namespace RatherWeird
             settings.InvokeAltUp = adhocSender?.IsChecked == true;
         }
 
-        private Process latestRa3 = null;
+        
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -105,24 +126,11 @@ namespace RatherWeird
 
             _foregroundWatcher.ForegroundChanged += ForegroundWatcher_ForegroundChanged;
             _keyboardWatcher.KeyboardInputChanged += _keyboardWatcher_KeyboardInputChanged;
-            _ra3Watcher.Ra3ProcessChanged += Ra3WatcherOnRa3ProcessChanged;
 
             DispatcherTimer tmr = new DispatcherTimer();
             tmr.Tick += Tmr_Tick;
             tmr.Interval = new TimeSpan(0, 0, 0, 1);
             tmr.Start();
-        }
-
-        private void Ra3WatcherOnRa3ProcessChanged(object sender, Ra3ProcessArgs ra3ProcessArgs)
-        {
-            _memoryManipulator.LockProcess();
-
-            if (ra3ProcessArgs.State == ProcessState.Started)
-            {
-                UnlockRa3Process(ra3ProcessArgs.ProcessId);
-                SwapHealthbarLogic();
-            }
-            
         }
 
         private void _keyboardWatcher_KeyboardInputChanged(object sender, KeyboardInputArgs e)
@@ -140,18 +148,18 @@ namespace RatherWeird
                 && (e.Flags & 1) == 1)
             {
 
-                if (latestRa3 != null)
-                    InvokeEnter(latestRa3.MainWindowHandle);
+                if (LatestRa3 != null)
+                    InvokeEnter(LatestRa3.MainWindowHandle);
             }
         }
 
         private void Tmr_Tick(object sender, EventArgs e)
         {
-            if (latestRa3 == null)
+            if (LatestRa3 == null)
                 return;
 
             var ra3Connections = Utility.Networking.GetAllTCPConnections()
-                .Where(connection => connection.owningPid == latestRa3.Id);
+                .Where(connection => connection.owningPid == LatestRa3.Id);
 
             foreach (var mibTcprowOwnerPid in ra3Connections)
             {
@@ -164,7 +172,6 @@ namespace RatherWeird
             _foregroundWatcher.Unhook();
             _keyboardWatcher.UnhookKeyboard();
             _memoryManipulator.LockProcess();
-            _ra3Watcher.Stop();
 
             Preferences.Write(settings);
         }
@@ -291,27 +298,16 @@ namespace RatherWeird
             SwapHealthbarLogic();
         }
 
-        private Process FindRa3Process()
-        {
-            // Probably only possible to have one of these since Ra3 takes care of only being available once..
-            Process[] ra3Procs = Process.GetProcessesByName("ra3_1.12.game");
-            
-            return ra3Procs.Length <= 0 ? null : ra3Procs[0];
-        }
-
         private void SwapHealthbarLogic()
         {
-            byte byteToWrite = settings.SwapHealthbarLogic ? (byte)117 : (byte)116;
+            if (LatestRa3 == null)
+            {
+                return;
+            }
+            
+            byte byteToWrite = settings.SwapHealthbarLogic ? (byte)116 : (byte)117;
             _memoryManipulator.WriteByte((IntPtr)0x0052EB93, byteToWrite);
         }
-
-        private bool UnlockRa3Process(int processId)
-        {
-            int properProcessId = processId == -1 ? FindRa3Process().Id : processId;
-
-            return _memoryManipulator.UnlockProcess(properProcessId,
-                MemoryManipulator.ProcessAccessFlags.VirtualMemoryWrite |
-                MemoryManipulator.ProcessAccessFlags.VirtualMemoryOperation, true);
-        }
+        
     }
 }

@@ -24,9 +24,6 @@ namespace RatherWeird.Utility
 
         // Stolen from: http://www.pinvoke.net/default.aspx/kernel32/CloseHandle.html
         [DllImport("kernel32.dll", SetLastError = true)]
-        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
-        [SuppressUnmanagedCodeSecurity]
-        [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool CloseHandle(IntPtr hObject);
 
         [DllImport("kernel32.dll", SetLastError = true)]
@@ -36,6 +33,7 @@ namespace RatherWeird.Utility
             byte[] lpBuffer,
             uint nSize,
             out uint lpNumberOfBytesWritten);
+        
 
         // Stolen from pinvoke: http://www.pinvoke.net/default.aspx/kernel32/OpenProcess.html
         [Flags]
@@ -56,38 +54,42 @@ namespace RatherWeird.Utility
             Synchronize = 0x00100000
         }
 
-        private int Ra3ProcessId { get; set; }
+        private Dictionary<IntPtr, Process> Ra3ProcessHandle { get; set; } = new Dictionary<IntPtr, Process>();
         private IntPtr Handle { get; set; } = IntPtr.Zero;
 
-        public bool UnlockProcess(int ra3ProcessId, ProcessAccessFlags flags, bool once = false)
+        public bool UnlockProcess(Process ra3Process, ProcessAccessFlags flags)
         {
-            Ra3ProcessId = ra3ProcessId;
-
-            // If once set, never set again!
-            if (once && Handle != IntPtr.Zero)
-            {
-                return true;
-            }
-
-
-            if (Handle != IntPtr.Zero)
-            {
-                // Assuming people use it again..
-                CloseHandle(Handle);
-            }
+            LockProcess();
 
             Handle = OpenProcess(
                 flags
                 , false
-                , ra3ProcessId
+                , ra3Process.Id
             );
 
-            return Handle != IntPtr.Zero;
+            if (Handle != IntPtr.Zero)
+            {
+                Ra3ProcessHandle.Add(Handle, ra3Process);
+                return true;
+            }
+
+            return false;
         }
 
         public bool LockProcess()
         {
-            return Handle == IntPtr.Zero || CloseHandle(Handle);
+            if (Handle != IntPtr.Zero &&
+                Ra3ProcessHandle.ContainsKey(Handle) &&
+                Ra3ProcessHandle[Handle].HasExited == false)
+            {
+                if (CloseHandle(Handle))
+                {
+                    Ra3ProcessHandle.Remove(Handle);
+                    Handle = IntPtr.Zero;
+                }
+            }
+
+            return true;
         }
 
         public bool WriteByte(IntPtr address, byte value)

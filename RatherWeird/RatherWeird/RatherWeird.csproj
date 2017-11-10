@@ -66,7 +66,6 @@
     </ApplicationDefinition>
     <Compile Include="Utility\MemoryManipulator.cs" />
     <Compile Include="Utility\Networking.cs" />
-    <Compile Include="Utility\Ra3ProcessWatcher.cs" />
     <Compile Include="Utility\Utility.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
