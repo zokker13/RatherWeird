@@ -5,12 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RatherWeird"
         mc:Ignorable="d"
-        Title="RatherWeird" Height="197" Width="534" Loaded="Window_Loaded" Closed="Window_Closed" ResizeMode="CanMinimize" Icon="dunno_man.ico">
+        Title="RatherWeird" Height="218.521" Width="534" Loaded="Window_Loaded" Closed="Window_Closed" ResizeMode="CanMinimize" Icon="dunno_man.ico">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <GroupBox x:Name="gpWindowBehavior" Header="Window Behavior" HorizontalAlignment="Left" Margin="10,10,0,0" Width="170" Height="138" VerticalAlignment="Top">
+        <GroupBox x:Name="gpWindowBehavior" Header="Window Behavior" HorizontalAlignment="Left" Margin="10,10,0,0" Width="170" Height="158" VerticalAlignment="Top">
             <Grid Margin="0,0,-2,-12">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -20,9 +20,10 @@
                 <CheckBox x:Name="chLaunchRa3Windowed" Content="Launch RA3 in Window" HorizontalAlignment="Left" Margin="10,52,0,0" VerticalAlignment="Top" Click="chLaunchRa3Windowed_Click"/>
                 <CheckBox x:Name="chRemoveBorders" Content="Remove Borders" HorizontalAlignment="Left" Margin="10,73,0,-5" VerticalAlignment="Top" Click="chRemoveBorders_Click"/>
                 <CheckBox x:Name="chHookNumpadEnter" Content="Hook Numpad Enter" HorizontalAlignment="Left" Margin="10,94,0,-7" VerticalAlignment="Top" Click="chHookNumpadEnter_Click"/>
+                <CheckBox x:Name="chSwapHealthbarLogic" Content="Swap Healthbar Logic" HorizontalAlignment="Left" Margin="10,114,0,-25" VerticalAlignment="Top" Click="chSwapHealthbarLogic_Click"/>
             </Grid>
         </GroupBox>
-        <GroupBox Header="Launch RA3" Margin="185,10,0,0" Height="138" VerticalAlignment="Top" HorizontalAlignment="Left" Width="322">
+        <GroupBox Header="Launch RA3" Margin="185,10,0,0" Height="158" VerticalAlignment="Top" HorizontalAlignment="Left" Width="322">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
@@ -35,7 +36,7 @@
                 <CheckBox x:Name="chRefreshPathToRa3" Content="Refresh Path to RA3 automatically" HorizontalAlignment="Left" VerticalAlignment="Top" Click="chRefreshPathToRa3_Click" Margin="10,10,0,0"/>
                 <TextBox x:Name="txtRa3Path" HorizontalAlignment="Left" Height="23" Margin="10,9,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="290" TextChanged="txtRa3Path_TextChanged" IsEnabled="False" Grid.Row="1"/>
                 <Button x:Name="btnLaunchRa3" Content="Launch RA3" HorizontalAlignment="Left" Margin="10,1,0,0" Width="97" Cursor="" Click="btnLaunchRa3_Click" Grid.Row="2" Height="34" VerticalAlignment="Top"/>
-                <Label x:Name="lblVersion" Content="Version: 0.2.0" Margin="0,10,10,0" Grid.Row="2" IsEnabled="False" Height="26" VerticalAlignment="Top" HorizontalAlignment="Right" Width="80"/>
+                <Label x:Name="lblVersion" Content="Version: 0.3.0" Margin="0,10,10,0" Grid.Row="2" IsEnabled="False" Height="26" VerticalAlignment="Top" HorizontalAlignment="Right" Width="80"/>
             </Grid>
         </GroupBox>
     </Grid>

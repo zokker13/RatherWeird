@@ -1,7 +1,10 @@
 # RatherWeird Changelog
 
-## ?? [??]
-### Stuff Fixed
+## 0.3.0 [2017-11-10]
+### Added
+* Swap the default healthbar behavior. Now automatically shows them if desired.
+
+### Fixed
 * RA3 process is launched in a Thread, making the UI *NOT* freeze.
 
 ## 0.2.0 [2017-06-03]

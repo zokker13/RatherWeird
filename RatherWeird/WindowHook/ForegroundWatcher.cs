@@ -31,9 +31,10 @@ namespace WindowHook
 
         #endregion
 
-        const uint WINEVENT_OUTOFCONTEXT = 0x0000; // Events are ASYNC
-        const uint EVENT_SYSTEM_FOREGROUND = 0x0003;
-        
+        private const uint WINEVENT_OUTOFCONTEXT = 0x0000; // Events are ASYNC
+        private const uint EVENT_SYSTEM_FOREGROUND = 0x0003;
+
+
         public event ForegroundChangeHandler ForegroundChanged;
 
         private IntPtr WndHook { get; set; } = IntPtr.Zero;
@@ -54,12 +55,14 @@ namespace WindowHook
         {
             _del = (hWinEventHook, eventType, hwnd, idObject, idChild, dwEventThread, dwmsEventTime) =>
             {
-                if (eventType == EVENT_SYSTEM_FOREGROUND)
-                {
-                    GetWindowThreadProcessId(hwnd, out uint processId);
-                    var process = Process.GetProcessById((int)processId);
+                GetWindowThreadProcessId(hwnd, out uint processId);
+                var process = Process.GetProcessById((int)processId);
 
-                    OnForegroundChange(this, new ForegroundArgs(process));
+                switch (eventType)
+                {
+                    case EVENT_SYSTEM_FOREGROUND:
+                        OnForegroundChange(this, new ForegroundArgs(process));
+                        break;
                 }
                     
             };
@@ -79,7 +82,7 @@ namespace WindowHook
         {
             UnhookWinEvent(WndHook);
         }
-
+        
         private void OnForegroundChange(object o, ForegroundArgs e)
         {
             ForegroundChanged?.Invoke(o, e);

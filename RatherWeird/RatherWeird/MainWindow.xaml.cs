@@ -20,6 +20,7 @@ using System.Windows.Threading;
 using WindowHook;
 using DirtyInvocation;
 using Microsoft.Win32;
+using RatherWeird.Utility;
 using CheckBox = System.Windows.Controls.CheckBox;
 using TextBox = System.Windows.Controls.TextBox;
 
@@ -32,7 +33,30 @@ namespace RatherWeird
     {
         private readonly ForegroundWatcher _foregroundWatcher = new ForegroundWatcher();
         private readonly KeyboardWatcher _keyboardWatcher = new KeyboardWatcher();
-        
+        private readonly MemoryManipulator _memoryManipulator = new MemoryManipulator();
+
+        private Process _latestRa3 = null;
+
+        private Process LatestRa3
+        {
+            get { return _latestRa3; }
+            set
+            {
+                if (value.Id != _latestRa3?.Id)
+                {
+                    _latestRa3 = value;
+
+                    _memoryManipulator.LockProcess();
+
+                    _memoryManipulator.UnlockProcess(LatestRa3,
+                        MemoryManipulator.ProcessAccessFlags.All |
+                        MemoryManipulator.ProcessAccessFlags.VirtualMemoryOperation);
+
+                    SwapHealthbarLogic();
+                }
+            }
+        }
+
         private SettingEntries settings;
 
         public MainWindow()
@@ -45,7 +69,7 @@ namespace RatherWeird
             if (e.Process.ProcessName!= "ra3_1.12.game")
                 return;
 
-            latestRa3 = e.Process;
+            LatestRa3 = e.Process;
             
             if (settings.RemoveBorder)
             {
@@ -90,7 +114,7 @@ namespace RatherWeird
             settings.InvokeAltUp = adhocSender?.IsChecked == true;
         }
 
-        private Process latestRa3 = null;
+        
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -124,18 +148,18 @@ namespace RatherWeird
                 && (e.Flags & 1) == 1)
             {
 
-                if (latestRa3 != null)
-                    InvokeEnter(latestRa3.MainWindowHandle);
+                if (LatestRa3 != null)
+                    InvokeEnter(LatestRa3.MainWindowHandle);
             }
         }
 
         private void Tmr_Tick(object sender, EventArgs e)
         {
-            if (latestRa3 == null)
+            if (LatestRa3 == null)
                 return;
 
             var ra3Connections = Utility.Networking.GetAllTCPConnections()
-                .Where(connection => connection.owningPid == latestRa3.Id);
+                .Where(connection => connection.owningPid == LatestRa3.Id);
 
             foreach (var mibTcprowOwnerPid in ra3Connections)
             {
@@ -147,6 +171,7 @@ namespace RatherWeird
         {
             _foregroundWatcher.Unhook();
             _keyboardWatcher.UnhookKeyboard();
+            _memoryManipulator.LockProcess();
 
             Preferences.Write(settings);
         }
@@ -159,6 +184,7 @@ namespace RatherWeird
             chRefreshPathToRa3.IsChecked = settings.RefreshPathToRa3;
             chRemoveBorders.IsChecked = settings.RemoveBorder;
             chHookNumpadEnter.IsChecked = settings.HookNumpadEnter;
+            chSwapHealthbarLogic.IsChecked = settings.SwapHealthbarLogic;
 
             txtRa3Path.Text = GetRa3Executable();
         }
@@ -263,5 +289,25 @@ namespace RatherWeird
             var adhocSender = sender as CheckBox;
             settings.HookNumpadEnter = adhocSender?.IsChecked == true;
         }
+
+        private void chSwapHealthbarLogic_Click(object sender, RoutedEventArgs e)
+        {
+            var adhocSender = sender as CheckBox;
+            settings.SwapHealthbarLogic = adhocSender?.IsChecked == true;
+
+            SwapHealthbarLogic();
+        }
+
+        private void SwapHealthbarLogic()
+        {
+            if (LatestRa3 == null)
+            {
+                return;
+            }
+            
+            byte byteToWrite = settings.SwapHealthbarLogic ? (byte)116 : (byte)117;
+            _memoryManipulator.WriteByte((IntPtr)0x0052EB93, byteToWrite);
+        }
+        
     }
 }
