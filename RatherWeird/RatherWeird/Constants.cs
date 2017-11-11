@@ -9,5 +9,6 @@ namespace RatherWeird
     public static class Constants
     {
         public static readonly string SettingsFile = "settings.xml";
+        public static readonly string Ra3ProcessName = "ra3_1.12.game";
     }
 }

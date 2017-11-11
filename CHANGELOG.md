@@ -1,5 +1,9 @@
 # RatherWeird Changelog
 
+## 0.4.0 [??]
+### Added
+* Support to disable Windows Keys (left and right).
+
 ## 0.3.0 [2017-11-10]
 ### Added
 * Swap the default healthbar behavior. Now automatically shows them if desired.

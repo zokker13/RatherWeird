@@ -66,7 +66,7 @@ namespace RatherWeird
 
         private void ForegroundWatcher_ForegroundChanged(object sender, ForegroundArgs e)
         {
-            if (e.Process.ProcessName!= "ra3_1.12.game")
+            if (e.Process.ProcessName!= Constants.Ra3ProcessName)
                 return;
 
             LatestRa3 = e.Process;
@@ -135,6 +135,11 @@ namespace RatherWeird
 
         private void _keyboardWatcher_KeyboardInputChanged(object sender, KeyboardInputArgs e)
         {
+            HookNumpadEnter(e);
+        }
+
+        private void HookNumpadEnter(KeyboardInputArgs e)
+        {
             if (settings.HookNumpadEnter == false)
                 return;
 
@@ -185,6 +190,7 @@ namespace RatherWeird
             chRemoveBorders.IsChecked = settings.RemoveBorder;
             chHookNumpadEnter.IsChecked = settings.HookNumpadEnter;
             chSwapHealthbarLogic.IsChecked = settings.SwapHealthbarLogic;
+            chDisableWinKey.IsChecked = settings.DisableWinKey;
 
             txtRa3Path.Text = GetRa3Executable();
         }
@@ -308,6 +314,41 @@ namespace RatherWeird
             byte byteToWrite = settings.SwapHealthbarLogic ? (byte)116 : (byte)117;
             _memoryManipulator.WriteByte((IntPtr)0x0052EB93, byteToWrite);
         }
-        
+
+        private void SwapWinKeyState(bool disableKey)
+        {
+            if (disableKey)
+            {
+                _keyboardWatcher.DisableKey(() =>
+                {
+                    Process foregroundProcess = WindowInvocation.GetForegroundProcess();
+
+                    if (foregroundProcess == null)
+                        return false;
+
+                    return foregroundProcess.ProcessName == Constants.Ra3ProcessName;
+                }, Keys.LWin, Keys.RWin);
+            }
+            else
+            {
+                _keyboardWatcher.EnableKey(Keys.LWin, Keys.RWin);
+            }
+        }
+
+        private void chDisableWinKey_Click(object sender, RoutedEventArgs e)
+        {
+            var adhocSender = sender as CheckBox;
+            settings.DisableWinKey = adhocSender?.IsChecked == true;
+        }
+
+        private void chDisableWinKey_Checked(object sender, RoutedEventArgs e)
+        {
+            SwapWinKeyState(true);
+        }
+
+        private void chDisableWinKey_Unchecked(object sender, RoutedEventArgs e)
+        {
+            SwapWinKeyState(false);
+        }
     }
 }

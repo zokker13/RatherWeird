@@ -119,10 +119,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\smug.png" />
+    <Resource Include="dunno_man.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="dunno_man.ico" />
+    <Folder Include="Resources\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

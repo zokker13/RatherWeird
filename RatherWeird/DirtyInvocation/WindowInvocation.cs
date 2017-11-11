@@ -38,6 +38,10 @@ namespace DirtyInvocation
 
         [DllImport("user32.dll")]
         private static extern bool GetClientRect(IntPtr hWnd, out RECT lpRect);
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetForegroundWindow();
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern uint GetWindowThreadProcessId(IntPtr hWnd, out int lpdwProcessId);
 
         #endregion
 
@@ -101,6 +105,15 @@ namespace DirtyInvocation
                 , currentOccupiedScreen.Bounds.Height
                 , (uint) WindowSizing.SWP_FRAMECHANGED
             );
+        }
+
+        public static Process GetForegroundProcess()
+        {
+            IntPtr handle = GetForegroundWindow();
+            int procId = -1;
+
+            GetWindowThreadProcessId(handle, out procId);
+            return Process.GetProcessById(procId);
         }
     }
 

@@ -5,12 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RatherWeird"
         mc:Ignorable="d"
-        Title="RatherWeird" Height="218.521" Width="534" Loaded="Window_Loaded" Closed="Window_Closed" ResizeMode="CanMinimize" Icon="dunno_man.ico">
+        Title="RatherWeird" Height="244.521" Width="534" Loaded="Window_Loaded" Closed="Window_Closed" ResizeMode="CanMinimize" Icon="dunno_man.ico">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <GroupBox x:Name="gpWindowBehavior" Header="Window Behavior" HorizontalAlignment="Left" Margin="10,10,0,0" Width="170" Height="158" VerticalAlignment="Top">
+        <GroupBox x:Name="gpWindowBehavior" Header="Window Behavior" HorizontalAlignment="Left" Margin="10,10,0,0" Width="170" Height="184" VerticalAlignment="Top">
             <Grid Margin="0,0,-2,-12">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -21,9 +21,10 @@
                 <CheckBox x:Name="chRemoveBorders" Content="Remove Borders" HorizontalAlignment="Left" Margin="10,73,0,-5" VerticalAlignment="Top" Click="chRemoveBorders_Click"/>
                 <CheckBox x:Name="chHookNumpadEnter" Content="Hook Numpad Enter" HorizontalAlignment="Left" Margin="10,94,0,-7" VerticalAlignment="Top" Click="chHookNumpadEnter_Click"/>
                 <CheckBox x:Name="chSwapHealthbarLogic" Content="Swap Healthbar Logic" HorizontalAlignment="Left" Margin="10,114,0,-25" VerticalAlignment="Top" Click="chSwapHealthbarLogic_Click"/>
+                <CheckBox x:Name="chDisableWinKey" Content="Disable WinKeys" HorizontalAlignment="Left" Margin="10,134,0,-44" VerticalAlignment="Top" Click="chDisableWinKey_Click" Checked="chDisableWinKey_Checked" Unchecked="chDisableWinKey_Unchecked"/>
             </Grid>
         </GroupBox>
-        <GroupBox Header="Launch RA3" Margin="185,10,0,0" Height="158" VerticalAlignment="Top" HorizontalAlignment="Left" Width="322">
+        <GroupBox Header="Launch RA3" Margin="185,10,0,0" Height="135" VerticalAlignment="Top" HorizontalAlignment="Left" Width="322">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>

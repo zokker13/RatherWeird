@@ -8,6 +8,7 @@
 * Lock mouse cursor in RA3 window
 * Numpad Enter Hook (When pressing Enter on the numpad, simulate Enter on the main keyboard)
 * Swap Healthbar logic (Healthbars can be shown automatically on start)
+* Disable Windows Keys 
 
 ## Todo
 * (Re-) Add borders around window to move it around
