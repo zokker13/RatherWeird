@@ -110,9 +110,12 @@ namespace DirtyInvocation
         public static Process GetForegroundProcess()
         {
             IntPtr handle = GetForegroundWindow();
-            int procId = -1;
 
-            GetWindowThreadProcessId(handle, out procId);
+            GetWindowThreadProcessId(handle, out var procId);
+
+            if (procId == -1)
+                return null;
+
             return Process.GetProcessById(procId);
         }
     }

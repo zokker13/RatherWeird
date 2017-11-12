@@ -1,6 +1,6 @@
 # RatherWeird Changelog
 
-## 0.4.0 [??]
+## 0.4.0 [2017-11-12]
 ### Added
 * Support to disable Windows Keys (left and right).
 
