@@ -58,6 +58,7 @@ namespace RatherWeird
         public bool RefreshPathToRa3;
         public bool HookNumpadEnter;
         public bool SwapHealthbarLogic;
+        public bool DisableWinKey;
 
         public SettingEntries()
         {
@@ -68,6 +69,7 @@ namespace RatherWeird
             RemoveBorder = true;
             HookNumpadEnter = true;
             SwapHealthbarLogic = false;
+            DisableWinKey = false;
         }
     }
 

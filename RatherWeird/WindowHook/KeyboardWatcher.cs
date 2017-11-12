@@ -38,7 +38,7 @@ namespace WindowHook
         }
     }
     public delegate void KeyboardInputChangeHandler(object sender, KeyboardInputArgs e);
-
+    
     public class KeyboardWatcher
     {
         #region DLLImport 
@@ -67,9 +67,35 @@ namespace WindowHook
 
         #endregion
 
+        private Dictionary<Keys, Func<bool>> _blacklistedKeys = new Dictionary<Keys, Func<bool>>();
+
         public event KeyboardInputChangeHandler KeyboardInputChanged;
 
-        public bool HookRegistered { get; private set; } = false;
+        public bool HookRegistered { get; private set; }
+
+        public void DisableKey(Func<bool> condition, params Keys[] keys)
+        {
+            if (keys.Length <= 0)
+                return;
+
+            foreach (var key in keys)
+            {
+                _blacklistedKeys.Add(key, condition);
+            }
+        }
+
+        public void EnableKey(params Keys[] keys)
+        {
+            if (keys.Length <= 0)
+                return;
+
+            foreach (var key in keys)
+            {
+                if (_blacklistedKeys.ContainsKey(key))
+                    _blacklistedKeys.Remove(key);
+            }
+        }
+
 
         public enum HookType : int
         {
@@ -123,11 +149,23 @@ namespace WindowHook
 
             _del = (int code, long wParam, ref KBDLLHOOKSTRUCT lParam) =>
             {
+                // If the code is less than 0, Windows want it to be processed without touching..
+                // https://msdn.microsoft.com/en-us/library/windows/desktop/ms644985(v=vs.85).aspx
                 if (code < 0)
                     return CallNextHookEx(IntPtr.Zero, code, wParam, ref lParam);
 
+                foreach (var blacklistedKey in _blacklistedKeys)
+                {
+                    if (blacklistedKey.Key == (Keys) lParam.vkCode
+                        && blacklistedKey.Value.Invoke())
+                    {
+                        return (IntPtr) 1;
+                    }
+                }
+                
                 OnKeyboardInputChanged(this, new KeyboardInputArgs(wParam, lParam.vkCode, lParam.flags));
                 return CallNextHookEx(IntPtr.Zero, code, wParam, ref lParam);
+                
             };
             
             HHook = SetWindowsHookEx(HookType.WH_KEYBOARD_LL, _del, IntPtr.Zero, 0);
