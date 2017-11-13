@@ -34,6 +34,7 @@ namespace RatherWeird
         private readonly ForegroundWatcher _foregroundWatcher = new ForegroundWatcher();
         private readonly KeyboardWatcher _keyboardWatcher = new KeyboardWatcher();
         private readonly MemoryManipulator _memoryManipulator = new MemoryManipulator();
+        private readonly MouseWatcher _mouseWatcher = new MouseWatcher();
 
         private Process _latestRa3 = null;
 
@@ -123,14 +124,21 @@ namespace RatherWeird
 
             _foregroundWatcher.HookForeground();
             _keyboardWatcher.HookKeyboard();
+            _mouseWatcher.HookMouse();
 
             _foregroundWatcher.ForegroundChanged += ForegroundWatcher_ForegroundChanged;
             _keyboardWatcher.KeyboardInputChanged += _keyboardWatcher_KeyboardInputChanged;
+            _mouseWatcher.MouseInputChanged += MouseWatcherOnMouseInputChanged;
 
             DispatcherTimer tmr = new DispatcherTimer();
             tmr.Tick += Tmr_Tick;
             tmr.Interval = new TimeSpan(0, 0, 0, 1);
             tmr.Start();
+        }
+
+        private void MouseWatcherOnMouseInputChanged(object sender, MouseInputArgs mouseInputArgs)
+        {
+            Title = $"Msg: {mouseInputArgs.MouseMessage} - Delta: {mouseInputArgs.Delta}";
         }
 
         private void _keyboardWatcher_KeyboardInputChanged(object sender, KeyboardInputArgs e)
@@ -177,6 +185,7 @@ namespace RatherWeird
             _foregroundWatcher.Unhook();
             _keyboardWatcher.UnhookKeyboard();
             _memoryManipulator.LockProcess();
+            _mouseWatcher.UnhookMouse();
 
             Preferences.Write(settings);
         }
