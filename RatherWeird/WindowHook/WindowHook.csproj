@@ -43,7 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ForegroundWatcher.cs" />
+    <Compile Include="SystemWatcher.cs" />
     <Compile Include="KeyboardWatcher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

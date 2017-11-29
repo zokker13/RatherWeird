@@ -1,5 +1,9 @@
 # RatherWeird Changelog
 
+## ??
+### Changed
+* Improved RA3 detection - if you restart RA3 or start the tool after RA3, RA3 will be detected faster and work directly.
+
 ## 0.4.0 [2017-11-12]
 ### Added
 * Support to disable Windows Keys (left and right).
