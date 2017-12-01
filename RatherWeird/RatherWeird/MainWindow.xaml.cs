@@ -139,7 +139,7 @@ namespace RatherWeird
             DispatcherTimer tmr = new DispatcherTimer();
             tmr.Tick += Tmr_Tick;
             tmr.Interval = new TimeSpan(0, 0, 0, 1);
-            tmr.Start();
+            // tmr.Start();
         }
 
         private void SystemWatcherOnHideWindow(object sender, ProcessArgs e)
