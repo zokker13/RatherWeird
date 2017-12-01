@@ -1,6 +1,6 @@
 # RatherWeird Changelog
 
-## ??
+## 0.4.1 [2017-12-01]
 ### Changed
 * Improved RA3 detection - if you restart RA3 or start the tool after RA3, RA3 will be detected faster and work directly.
 
