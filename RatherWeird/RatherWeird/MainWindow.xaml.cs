@@ -34,6 +34,7 @@ namespace RatherWeird
         private readonly SystemWatcher _systemWatcher = new SystemWatcher();
         private readonly KeyboardWatcher _keyboardWatcher = new KeyboardWatcher();
         private readonly MemoryManipulator _memoryManipulator = new MemoryManipulator();
+        private readonly DebugWindow _debugWindow = new DebugWindow();
 
         private Process _latestRa3 = null;
 
@@ -128,6 +129,9 @@ namespace RatherWeird
             _systemWatcher.ShowWindow += SystemWatcherOnShowWindow;
             _systemWatcher.HideWindow += SystemWatcherOnHideWindow;
             _keyboardWatcher.KeyboardInputChanged += _keyboardWatcher_KeyboardInputChanged;
+            _memoryManipulator.ProcessUnlocked += MemoryManipulatorOnProcessUnlocked;
+            _memoryManipulator.ProcessLocked += MemoryManipulatorOnProcessLocked;
+            _memoryManipulator.MemoryWatchChanged += MemoryManipulatorOnMemoryWatchChanged;
 
             var ra3Procs = Process.GetProcessesByName(Constants.Ra3ProcessName);
             if (ra3Procs.Length > 0)
@@ -140,6 +144,26 @@ namespace RatherWeird
             tmr.Tick += Tmr_Tick;
             tmr.Interval = new TimeSpan(0, 0, 0, 1);
             // tmr.Start();
+
+#if DEBUG
+            _debugWindow.Show();
+#endif
+        }
+
+        private void MemoryManipulatorOnMemoryWatchChanged(object sender, MemoryWatchArgs memoryWatchArgs)
+        {
+            _debugWindow.InsertText(Encoding.ASCII.GetString(memoryWatchArgs.Buffer));
+            //Console.WriteLine(Encoding.ASCII.GetString(memoryWatchArgs.Buffer));
+        }
+
+        private void MemoryManipulatorOnProcessLocked(object sender, ProcessHandleArgs processHandleArgs)
+        {
+
+        }
+
+        private void MemoryManipulatorOnProcessUnlocked(object sender, ProcessHandleArgs processHandleArgs)
+        {
+            _memoryManipulator.WatchAddress((IntPtr)0x00CF5A00, 269);
         }
 
         private void SystemWatcherOnHideWindow(object sender, ProcessArgs e)
