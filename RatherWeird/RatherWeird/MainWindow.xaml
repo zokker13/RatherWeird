@@ -15,16 +15,66 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <CheckBox x:Name="chInvokeAltUp" Content="Invoke ALT UP" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="chInvokeAltUp_Click"/>
-                <CheckBox x:Name="chLockCursor" Content="Lock Cursor" HorizontalAlignment="Left" Margin="10,31,0,0" VerticalAlignment="Top" Click="chLockCursor_Click"/>
-                <CheckBox x:Name="chLaunchRa3Windowed" Content="Launch RA3 in Window" HorizontalAlignment="Left" Margin="10,52,0,0" VerticalAlignment="Top" Click="chLaunchRa3Windowed_Click"/>
-                <CheckBox x:Name="chRemoveBorders" Content="Remove Borders" HorizontalAlignment="Left" Margin="10,73,0,-5" VerticalAlignment="Top" Click="chRemoveBorders_Click"/>
-                <CheckBox x:Name="chHookNumpadEnter" Content="Hook Numpad Enter" HorizontalAlignment="Left" Margin="10,94,0,-7" VerticalAlignment="Top" Click="chHookNumpadEnter_Click"/>
-                <CheckBox x:Name="chSwapHealthbarLogic" Content="Swap Healthbar Logic" HorizontalAlignment="Left" Margin="10,114,0,-25" VerticalAlignment="Top" Click="chSwapHealthbarLogic_Click"/>
-                <CheckBox x:Name="chDisableWinKey" Content="Disable WinKeys" HorizontalAlignment="Left" Margin="10,134,0,-44" VerticalAlignment="Top" Click="chDisableWinKey_Click" Checked="chDisableWinKey_Checked" Unchecked="chDisableWinKey_Unchecked"/>
+                <CheckBox ToolTipService.ShowDuration="10000" x:Name="chInvokeAltUp" Content="Invoke ALT UP" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="chInvokeAltUp_Click">
+                    <CheckBox.ToolTip>
+                        <StackPanel>
+                            <TextBlock>Invokes a Keypress (UP) for the ALT key (left to space).</TextBlock>
+                            <TextBlock>This fixes a bug that happens when you tab out of the game with ALT + TAB.</TextBlock>
+                            <TextBlock>The game may doesn't register the following ALT UP upon releasing the keycombination.</TextBlock>
+                        </StackPanel>
+                    </CheckBox.ToolTip>
+                </CheckBox>
+                <CheckBox x:Name="chLockCursor" ToolTipService.ShowDuration="10000" Content="Lock Cursor" HorizontalAlignment="Left" Margin="10,31,0,0" VerticalAlignment="Top" Click="chLockCursor_Click">
+                    <CheckBox.ToolTip>
+                        <StackPanel>
+                            <TextBlock>Locks the mousecursor to RA3.</TextBlock>
+                            <TextBlock>This is needed when playing in Window Mode so the cursor doesn't fall off the RA3 Window.</TextBlock>
+                        </StackPanel>
+                    </CheckBox.ToolTip>
+                </CheckBox>
+                <CheckBox x:Name="chLaunchRa3Windowed" ToolTipService.ShowDuration="10000" Content="Launch RA3 in Window" HorizontalAlignment="Left" Margin="10,52,0,0" VerticalAlignment="Top" Click="chLaunchRa3Windowed_Click">
+                    <CheckBox.ToolTip>
+                        <StackPanel>
+                            <TextBlock>Launches RA3 in a Window. Requires you to set the path in the right box.</TextBlock>
+                        </StackPanel>
+                    </CheckBox.ToolTip>
+                </CheckBox>
+                <CheckBox x:Name="chRemoveBorders" ToolTipService.ShowDuration="10000" Content="Remove Borders" HorizontalAlignment="Left" Margin="10,73,0,-5" VerticalAlignment="Top" Click="chRemoveBorders_Click">
+                    <CheckBox.ToolTip>
+                        <StackPanel>
+                            <TextBlock>Removes the Window borders around RA3.</TextBlock>
+                            <TextBlock>This is only usefull if you play in Window mode so the game is resized to your main screen.</TextBlock>
+                        </StackPanel>
+                    </CheckBox.ToolTip>
+                </CheckBox>
+                <CheckBox x:Name="chHookNumpadEnter" ToolTipService.ShowDuration="10000" Content="Hook Numpad Enter" HorizontalAlignment="Left" Margin="10,94,0,-7" VerticalAlignment="Top" Click="chHookNumpadEnter_Click">
+                    <CheckBox.ToolTip>
+                        <StackPanel>
+                            <TextBlock>Hooks the Numpad enter and simulates a normal enter to the game only.</TextBlock>
+                            <TextBlock>This is needed because RA3 doesn't properly extract key presses in the chat.</TextBlock>
+                        </StackPanel>
+                    </CheckBox.ToolTip>
+                </CheckBox>
+                <CheckBox x:Name="chSwapHealthbarLogic" ToolTipService.ShowDuration="10000" Content="Swap Healthbar Logic" HorizontalAlignment="Left" Margin="10,114,0,-25" VerticalAlignment="Top" Click="chSwapHealthbarLogic_Click">
+                    <CheckBox.ToolTip>
+                        <StackPanel>
+                            <TextBlock>This switches the Healbar Logic in the game.</TextBlock>
+                            <TextBlock>Usually the game starts with Healthbars turned off with no option to reverse it.</TextBlock>
+                            <TextBlock>With this option you can enable the Healthbars by default but also switch them off normally.</TextBlock>
+                        </StackPanel>
+                    </CheckBox.ToolTip>
+                </CheckBox>
+                <CheckBox x:Name="chDisableWinKey" ToolTipService.ShowDuration="10000" Content="Disable WinKeys" HorizontalAlignment="Left" Margin="10,134,0,-44" VerticalAlignment="Top" Click="chDisableWinKey_Click" Checked="chDisableWinKey_Checked" Unchecked="chDisableWinKey_Unchecked">
+                    <CheckBox.ToolTip>
+                        <StackPanel>
+                            <TextBlock>This option disables the Windows Keys when RA3 is in focus.</TextBlock>
+                            <TextBlock>This helps when you click on those keys and the game minimizes and you lose fights.</TextBlock>
+                        </StackPanel>
+                    </CheckBox.ToolTip>
+                </CheckBox>
             </Grid>
         </GroupBox>
-        <GroupBox Header="Launch RA3" Margin="185,10,0,0" Height="135" VerticalAlignment="Top" HorizontalAlignment="Left" Width="322">
+        <GroupBox Header="Launch RA3" Margin="185,10,0,0" Height="110" VerticalAlignment="Top" HorizontalAlignment="Left" Width="322">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
@@ -34,11 +84,32 @@
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <CheckBox x:Name="chRefreshPathToRa3" Content="Refresh Path to RA3 automatically" HorizontalAlignment="Left" VerticalAlignment="Top" Click="chRefreshPathToRa3_Click" Margin="10,10,0,0"/>
-                <TextBox x:Name="txtRa3Path" HorizontalAlignment="Left" Height="23" Margin="10,9,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="272" TextChanged="txtRa3Path_TextChanged" IsEnabled="False" Grid.Row="1"/>
-                <Button x:Name="btnLaunchRa3" Content="Launch RA3" HorizontalAlignment="Left" Margin="10,1,0,0" Width="97" Cursor="" Click="btnLaunchRa3_Click" Grid.Row="2" Height="34" VerticalAlignment="Top"/>
-                <Label x:Name="lblVersion" Content="Version: 0.4.1" Margin="0,10,10,0" Grid.Row="2" IsEnabled="False" Height="26" VerticalAlignment="Top" HorizontalAlignment="Right" Width="80"/>
-                <Button x:Name="btnBrowse" Content="..." HorizontalAlignment="Left" Margin="287,9,0,0" Grid.Row="1" VerticalAlignment="Top" Width="18" Height="23" Click="btnBrowse_Click"/>
+                <TextBox x:Name="txtRa3Path" ToolTipService.ShowDuration="10000" HorizontalAlignment="Left" Height="23" Margin="10,9,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="272" TextChanged="txtRa3Path_TextChanged" IsEnabled="False" Grid.Row="1">
+                    <TextBox.ToolTip>
+                        <StackPanel>
+                            <TextBlock>Shows the path of RA3.exe.</TextBlock>
+                            <TextBlock>If you don't see anything here, click on the button to the right.</TextBlock>
+                        </StackPanel>
+                    </TextBox.ToolTip>
+                </TextBox>
+                <Button x:Name="btnLaunchRa3" ToolTipService.ShowDuration="10000" Content="Launch RA3" HorizontalAlignment="Left" Margin="10,43,0,0" Width="97" Cursor="" Click="btnLaunchRa3_Click" Grid.Row="1" Height="34" VerticalAlignment="Top" Grid.RowSpan="2">
+                    <Button.ToolTip>
+                        <StackPanel>
+                            <TextBlock>Launch the game, god dammit!</TextBlock>
+                        </StackPanel>
+                    </Button.ToolTip>
+                </Button>
+                <Label x:Name="lblVersion" Content="Version: 0.4.1" Margin="0,47,10,0" Grid.Row="1" IsEnabled="False" Height="26" VerticalAlignment="Top" HorizontalAlignment="Right" Width="80" Grid.RowSpan="2"/>
+                <Button x:Name="btnBrowse" ToolTipService.ShowDuration="10000" Content="..." HorizontalAlignment="Left" Margin="287,9,0,0" Grid.Row="1" VerticalAlignment="Top" Width="18" Height="23" Click="btnBrowse_Click">
+                    <Button.ToolTip>
+                        <StackPanel>
+                            <TextBlock>Browse for the RA3 exe file.</TextBlock>
+                            <TextBlock>Only use this if your registry is somewhat broken.</TextBlock>
+                            <TextBlock>The following key is read:</TextBlock>
+                            <TextBlock>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RA3.exe</TextBlock>
+                        </StackPanel>
+                    </Button.ToolTip>
+                </Button>
             </Grid>
         </GroupBox>
     </Grid>

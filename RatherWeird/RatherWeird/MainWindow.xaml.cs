@@ -91,16 +91,6 @@ namespace RatherWeird
                 });
 
             }
-
-            if (settings.RefreshPathToRa3)
-            {
-                // Dirty?
-                string manualPath = Path.Combine(
-                    Path.GetDirectoryName(Path.GetDirectoryName(e.Process.MainModule.FileName))
-                    , "RA3.exe"
-                );
-                txtRa3Path.Text = manualPath;
-            }
         }
 
         private void chLockCursor_Click(object sender, RoutedEventArgs e)
@@ -120,6 +110,7 @@ namespace RatherWeird
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             settings = Preferences.Load();
+
             SetupControls();
 
             _systemWatcher.Hook();
@@ -209,7 +200,6 @@ namespace RatherWeird
             chInvokeAltUp.IsChecked = settings.InvokeAltUp;
             chLockCursor.IsChecked = settings.LockCursor;
             chLaunchRa3Windowed.IsChecked = settings.LaunchRa3Windowed;
-            chRefreshPathToRa3.IsChecked = settings.RefreshPathToRa3;
             chRemoveBorders.IsChecked = settings.RemoveBorder;
             chHookNumpadEnter.IsChecked = settings.HookNumpadEnter;
             chSwapHealthbarLogic.IsChecked = settings.SwapHealthbarLogic;
@@ -383,8 +373,8 @@ namespace RatherWeird
             if (result == true)
             {
                 settings.Ra3ExecutablePath = diag.FileName;
+                txtRa3Path.Text = diag.FileName;
                 settings.RefreshPathToRa3 = false;
-                chRefreshPathToRa3.IsChecked = false;
             }
 
         }
