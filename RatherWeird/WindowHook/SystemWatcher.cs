@@ -28,8 +28,19 @@ namespace WindowHook
 
         [DllImport("user32.dll", SetLastError = true)]
         static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
-
+        
         #endregion
+
+        public struct POINT
+        {
+            public int x;
+            public int y;
+
+            public override string ToString()
+            {
+                return $"X: {x}, Y: {y}";
+            }
+        }
 
         public enum SystemEvents
         {
@@ -122,6 +133,20 @@ namespace WindowHook
                         break;
                 }
             };
+
+            // DEBUG
+            /*
+            _wndHooks.Add(
+                SetWinEventHook(
+                    SystemEvents.EventMin
+                    , SystemEvents.EventMax
+                    , IntPtr.Zero
+                    , _del
+                    , 0
+                    , 0
+                    , WINEVENT_OUTOFCONTEXT
+                )
+            );*/
 
             _wndHooks.Add(
                 SetWinEventHook(

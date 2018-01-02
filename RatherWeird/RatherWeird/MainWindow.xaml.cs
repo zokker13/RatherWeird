@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
@@ -32,10 +33,14 @@ namespace RatherWeird
     /// </summary>
     public partial class MainWindow : Window
     {
+        [DllImport("user32.dll")]
+        static extern bool ScreenToClient(IntPtr hWnd, ref POINT lpPoint);
+
         private readonly SystemWatcher _systemWatcher = new SystemWatcher();
         private readonly KeyboardWatcher _keyboardWatcher = new KeyboardWatcher();
+        private readonly MouseWatcher _mouseWatcher = new MouseWatcher();
         private readonly MemoryManipulator _memoryManipulator = new MemoryManipulator();
-
+        
         private Process _latestRa3 = null;
 
         private Process LatestRa3
@@ -115,11 +120,13 @@ namespace RatherWeird
 
             _systemWatcher.Hook();
             _keyboardWatcher.HookKeyboard();
+            _mouseWatcher.HookMouse();
 
             _systemWatcher.ForegroundChanged += SystemWatcherSystemChanged;
             _systemWatcher.ShowWindow += SystemWatcherOnShowWindow;
             _systemWatcher.HideWindow += SystemWatcherOnHideWindow;
             _keyboardWatcher.KeyboardInputChanged += _keyboardWatcher_KeyboardInputChanged;
+            _mouseWatcher.MouseInputChanged += MouseWatcherOnMouseInputChanged;
 
             var ra3Procs = Process.GetProcessesByName(Constants.Ra3ProcessName);
             if (ra3Procs.Length > 0)
@@ -132,6 +139,17 @@ namespace RatherWeird
             tmr.Tick += Tmr_Tick;
             tmr.Interval = new TimeSpan(0, 0, 0, 1);
             // tmr.Start();
+        }
+
+        private void MouseWatcherOnMouseInputChanged(object sender, MouseInputArgs mouseInputArgs)
+        {
+            if (LatestRa3 == null)
+                return;
+            
+            POINT point = mouseInputArgs.Point;
+            ScreenToClient(LatestRa3.MainWindowHandle, ref point);
+
+            Title = point.ToString();
         }
 
         private void SystemWatcherOnHideWindow(object sender, ProcessArgs e)
@@ -190,6 +208,7 @@ namespace RatherWeird
         {
             _systemWatcher.Unhook();
             _keyboardWatcher.UnhookKeyboard();
+            _mouseWatcher.UnhookMouse();
             _memoryManipulator.LockProcess();
 
             Preferences.Write(settings);
@@ -256,13 +275,7 @@ namespace RatherWeird
 
             return "";
         }
-
-        private void chRefreshPathToRa3_Click(object sender, RoutedEventArgs e)
-        {
-            var adhocSender = sender as CheckBox;
-            settings.RefreshPathToRa3 = adhocSender?.IsChecked == true;
-        }
-
+        
         private void btnLaunchRa3_Click(object sender, RoutedEventArgs e)
         {
             Task.Run(() =>
