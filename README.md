@@ -1,5 +1,5 @@
 # Rather Weird
-[CHANGELOG](./CHANGELOG.md) | A stupid tool with a stupid name to manipulate RA3 in a good manner
+[CHANGELOG](./CHANGELOG.md) | [Red3.org Discussion](https://www.gamereplays.org/community/index.php?s=&showtopic=998432&view=findpost&p=10043767) | A stupid tool with a stupid name to manipulate RA3 in a good manner
 
 ## Features
 * Automatically Press the ALT key (UP) if you move back to RA3 (Makes hotkeys usable)
