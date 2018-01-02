@@ -380,6 +380,7 @@ namespace RatherWeird
         private void btnBrowse_Click(object sender, RoutedEventArgs e)
         {
             Microsoft.Win32.OpenFileDialog diag = new Microsoft.Win32.OpenFileDialog();
+            diag.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
             diag.Filter = "Red Alert 3 Executable|RA3.exe";
 
             bool? result = diag.ShowDialog();
