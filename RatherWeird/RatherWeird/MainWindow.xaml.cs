@@ -22,6 +22,7 @@ using DirtyInvocation;
 using Microsoft.Win32;
 using RatherWeird.Utility;
 using CheckBox = System.Windows.Controls.CheckBox;
+using FileDialog = Microsoft.Win32.FileDialog;
 using TextBox = System.Windows.Controls.TextBox;
 
 namespace RatherWeird
@@ -371,6 +372,21 @@ namespace RatherWeird
         private void chDisableWinKey_Unchecked(object sender, RoutedEventArgs e)
         {
             SwapWinKeyState(false);
+        }
+
+        private void btnBrowse_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.OpenFileDialog diag = new Microsoft.Win32.OpenFileDialog();
+            diag.Filter = "Red Alert 3 Executable|RA3.exe";
+
+            bool? result = diag.ShowDialog();
+            if (result == true)
+            {
+                settings.Ra3ExecutablePath = diag.FileName;
+                settings.RefreshPathToRa3 = false;
+                chRefreshPathToRa3.IsChecked = false;
+            }
+
         }
     }
 }
