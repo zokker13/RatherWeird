@@ -56,7 +56,7 @@ namespace DirtyInvocation
         }
 
 
-        public static void LockToProcess(Process process)
+        public static bool LockToProcess(Process process)
         {
             RECT windowRect, clientRect;
             GetWindowRect(process.MainWindowHandle, out windowRect);
@@ -71,8 +71,7 @@ namespace DirtyInvocation
             lockPosition.Top = windowRect.Top + topBorderThickness - borderThickness; 
             lockPosition.Bottom = clientRect.Bottom + windowRect.Top + topBorderThickness - borderThickness;
 
-            ClipCursor(ref lockPosition);
-
+            return ClipCursor(ref lockPosition);
         }
 
         public static void DropBorder(Process process)

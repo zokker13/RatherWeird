@@ -10,5 +10,6 @@ namespace RatherWeird
     {
         public static readonly string SettingsFile = "settings.xml";
         public static readonly string Ra3ProcessName = "ra3_1.12.game";
+        public static readonly string Logfile = "ratherweird_log.txt";
     }
 }

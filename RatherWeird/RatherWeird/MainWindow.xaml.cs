@@ -82,10 +82,14 @@ namespace RatherWeird
             {
                 WindowInvocation.DropBorder(e.Process);
                 WindowInvocation.ResizeWindow(e.Process);
+                Logger.Info("OK.. drop border and resize");
             }
 
             if (settings.LockCursor)
-                WindowInvocation.LockToProcess(e.Process);
+            {
+                bool success = WindowInvocation.LockToProcess(e.Process);
+                Logger.Info($"OK.. lock cursor to ra3 window. success: {success}");
+            }
 
             if (settings.InvokeAltUp)
             {
@@ -94,6 +98,7 @@ namespace RatherWeird
                     Messaging.SimulateAltKeyPress(e.Process.MainWindowHandle);
                     // Messaging.InvokeSysKeyPress(e.Process.MainWindowHandle, (uint) Keys.Menu);
                     // Messaging.InvokeSysKeyPress(e.Process.MainWindowHandle, (int)Keys.Menu); // ALT key
+                    Logger.Info("OK.. invoke alt keypress after ra3 has gained focus");
                 });
 
             }
@@ -110,11 +115,10 @@ namespace RatherWeird
             var adhocSender = sender as CheckBox;
             settings.InvokeAltUp = adhocSender?.IsChecked == true;
         }
-
         
-
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            RemoveLog();
             settings = Preferences.Load();
 
             SetupControls();
@@ -139,7 +143,23 @@ namespace RatherWeird
             DispatcherTimer tmr = new DispatcherTimer();
             tmr.Tick += Tmr_Tick;
             tmr.Interval = new TimeSpan(0, 0, 0, 1);
+
+            Logger.Info("OK.. application launch");
             // tmr.Start();
+        }
+
+        private void RemoveLog()
+        {
+            try
+            {
+                using (var fs = File.Create(Constants.Logfile))
+                {
+                }
+            }
+            catch (IOException ex)
+            {
+                // Good
+            }
         }
 
         private void MouseWatcherOnMouseInputChanged(object sender, MouseInputArgs mouseInputArgs)
@@ -200,7 +220,10 @@ namespace RatherWeird
             {
 
                 if (LatestRa3 != null)
+                {
                     InvokeEnter(LatestRa3.MainWindowHandle);
+                    Logger.Info("OK.. invoke enter after numpad enter hook");
+                }
             }
         }
 
@@ -239,6 +262,8 @@ namespace RatherWeird
             chDisableWinKey.IsChecked = settings.DisableWinKey;
 
             txtRa3Path.Text = GetRa3Executable();
+
+            Logger.Debug("OK.. setup of controls");
         }
 
         private void chLaunchRa3Windowed_Click(object sender, RoutedEventArgs e)
@@ -270,9 +295,9 @@ namespace RatherWeird
                     , null
                 );
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // TODO: Report..?
+                Logger.Error($"could not read from registry. {ex.Message}");
             }
 
             return pathToRa3;
@@ -286,7 +311,7 @@ namespace RatherWeird
             string pathFromRegistry = GetRa3ExecutableFromRegistry();
             if (CheckFileExistence(pathFromRegistry))
                 return pathFromRegistry;
-
+            
             return "";
         }
         
@@ -296,7 +321,11 @@ namespace RatherWeird
             {
                 string pathToRa3 = GetRa3Executable();
                 if (pathToRa3 == "")
-                    return; // TODO: Call message!?
+                {
+                    Logger.Error("could not get path to ra3 executable");
+                    System.Windows.MessageBox.Show("Please set the path of the RA3 path. We won't go further",
+                        "RA3 path missing", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
 
                 string arguments = settings.LaunchRa3Windowed
                     ? " -win"
@@ -328,7 +357,6 @@ namespace RatherWeird
             Messaging.SendMessage(handle, (int)Messaging.WM.Char, (uint)Keys.Enter, 0x1C0001);
             Messaging.SendMessage(handle, (int)Messaging.WM.KeyUp, (uint)Keys.Enter, 0xC01C0001);
         }
-        
 
         private void chHookNumpadEnter_Click(object sender, RoutedEventArgs e)
         {
@@ -352,7 +380,9 @@ namespace RatherWeird
             }
             
             byte byteToWrite = settings.SwapHealthbarLogic ? (byte)116 : (byte)117;
-            _memoryManipulator.WriteByte((IntPtr)0x0052EB93, byteToWrite);
+            bool success = _memoryManipulator.WriteByte((IntPtr)0x0052EB93, byteToWrite);
+
+            Logger.Info($"swap healthbar logic successful: {success}");
         }
 
         private void SwapWinKeyState(bool disableKey)

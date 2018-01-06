@@ -64,6 +64,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Utility\Logger.cs" />
     <Compile Include="Utility\MemoryManipulator.cs" />
     <Compile Include="Utility\Networking.cs" />
     <Compile Include="Utility\Utility.cs" />

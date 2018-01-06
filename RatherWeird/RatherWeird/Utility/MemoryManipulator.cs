@@ -61,6 +61,7 @@ namespace RatherWeird.Utility
         {
             LockProcess();
 
+            Logger.Debug("attempt to unlock process (open process)");
             Handle = OpenProcess(
                 flags
                 , false
@@ -70,9 +71,11 @@ namespace RatherWeird.Utility
             if (Handle != IntPtr.Zero)
             {
                 Ra3ProcessHandle.Add(Handle, ra3Process);
+                Logger.Debug("OK.. unlock process (open process)");
                 return true;
             }
 
+            Logger.Debug("ER.. unlock process (open process)");
             return false;
         }
 
@@ -82,11 +85,15 @@ namespace RatherWeird.Utility
                 Ra3ProcessHandle.ContainsKey(Handle) &&
                 Ra3ProcessHandle[Handle].HasExited == false)
             {
+                Logger.Debug("attempt to lock process (close handle)");
                 if (CloseHandle(Handle))
                 {
                     Ra3ProcessHandle.Remove(Handle);
                     Handle = IntPtr.Zero;
+                    Logger.Debug("OK.. lock process (close handle)");
                 }
+                else
+                    Logger.Debug("ER.. lock process (close handle)");
             }
 
             return true;
