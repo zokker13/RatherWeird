@@ -14,6 +14,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Forms;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
@@ -149,7 +150,7 @@ namespace RatherWeird
             POINT point = mouseInputArgs.Point;
             ScreenToClient(LatestRa3.MainWindowHandle, ref point);
 
-            Title = point.ToString();
+            // Title = point.ToString();
         }
 
         private void SystemWatcherOnHideWindow(object sender, ProcessArgs e)
@@ -168,8 +169,21 @@ namespace RatherWeird
         private void _keyboardWatcher_KeyboardInputChanged(object sender, KeyboardInputArgs e)
         {
             HookNumpadEnter(e);
+            // HookSpace(e);
         }
 
+        private void HookSpace(KeyboardInputArgs e)
+        {
+            if (e.Key != Keys.Space)
+                return;
+            
+            if (LatestRa3 == null)
+                return;
+
+            //Console.WriteLine(e.Flags);
+            //Messaging.SendMessage(LatestRa3.MainWindowHandle, (int)Messaging.WM.Char, 0x20, 0x390001);
+        }
+        
         private void HookNumpadEnter(KeyboardInputArgs e)
         {
             if (settings.HookNumpadEnter == false)
