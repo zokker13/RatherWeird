@@ -61,7 +61,7 @@ namespace RatherWeird.Utility
         {
             LockProcess();
 
-            Logger.Debug("attempt to unlock process (open process)");
+            Logger.Debug($"attempt to unlock process (open process). using pid {ra3Process.Id}");
             Handle = OpenProcess(
                 flags
                 , false
@@ -75,7 +75,9 @@ namespace RatherWeird.Utility
                 return true;
             }
 
-            Logger.Debug("ER.. unlock process (open process)");
+            int errCode = Marshal.GetLastWin32Error();
+
+            Logger.Error($"ER.. unlock process (open process). code: {errCode}");
             return false;
         }
 
@@ -93,9 +95,13 @@ namespace RatherWeird.Utility
                     Logger.Debug("OK.. lock process (close handle)");
                 }
                 else
-                    Logger.Debug("ER.. lock process (close handle)");
+                {
+                    int errCode = Marshal.GetLastWin32Error();
+                    Logger.Error($"ER.. lock process (close handle). code: {errCode}");
+                }
             }
 
+            Logger.Debug("no process or handle found that could be closed");
             return true;
         }
 
@@ -106,9 +112,22 @@ namespace RatherWeird.Utility
                 throw new InvalidHandle();
             }
 
+            Logger.Debug($"attempt to write byte to {address.ToString("X8")}");
+
             byte[] bytesToWrite = {value};
 
-            return WriteProcessMemory(Handle, address, bytesToWrite, 1, out _);
+            bool success = WriteProcessMemory(Handle, address, bytesToWrite, 1, out _);
+            if (success)
+            {
+                Logger.Debug("OK.. write byte");
+            }
+            else
+            {
+                int errCode = Marshal.GetLastWin32Error();
+                Logger.Error($"ER.. write byte. code: {errCode}");
+            }
+
+            return success;
         }
     }
 }

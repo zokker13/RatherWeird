@@ -55,5 +55,17 @@ namespace RatherWeird.Utility
             Log(LogType.Fatal, text);
             MessageBox.Show($"Fatal Error was thrown:\n{text}\nYou shouldn't see this.", "FATAL ERROR");
         }
+
+        public static string Fillerline(string repeatingText, int amount)
+        {
+            StringBuilder sb = new StringBuilder(amount * repeatingText.Length);
+
+            for (int i = 0; i < amount; i++)
+            {
+                sb.Append(repeatingText);
+            }
+
+            return sb.ToString();
+        }
     }
 }

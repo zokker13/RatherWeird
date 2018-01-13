@@ -119,6 +119,8 @@ namespace RatherWeird
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             RemoveLog();
+            Utility.Utility.LogSystemInformation();
+            
             settings = Preferences.Load();
 
             SetupControls();

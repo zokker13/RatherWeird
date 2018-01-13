@@ -99,7 +99,7 @@
                         </StackPanel>
                     </Button.ToolTip>
                 </Button>
-                <Label x:Name="lblVersion" Content="Version: 0.5.0-pre.1" Margin="0,3,10,0" Grid.Row="2" Height="26" VerticalAlignment="Top" HorizontalAlignment="Right" Width="112" IsEnabled="False"/>
+                <Label x:Name="lblVersion" Content="Version: 0.5.0-pre.2" Margin="0,3,10,0" Grid.Row="2" Height="26" VerticalAlignment="Top" HorizontalAlignment="Right" Width="112" IsEnabled="False"/>
                 <Button x:Name="btnBrowse" ToolTipService.ShowDuration="10000" Content="..." HorizontalAlignment="Left" Margin="287,9,0,0" Grid.Row="1" VerticalAlignment="Top" Width="18" Height="23" Click="btnBrowse_Click">
                     <Button.ToolTip>
                         <StackPanel>
