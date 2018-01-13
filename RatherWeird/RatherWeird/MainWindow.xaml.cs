@@ -264,6 +264,7 @@ namespace RatherWeird
             chDisableWinKey.IsChecked = settings.DisableWinKey;
 
             txtRa3Path.Text = GetRa3Executable();
+            lblVersion.Content = $"Version: {Constants.ApplicationVersion}";
 
             Logger.Debug("OK.. setup of controls");
         }

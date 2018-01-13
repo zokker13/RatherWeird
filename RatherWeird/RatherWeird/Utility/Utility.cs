@@ -14,8 +14,8 @@ namespace RatherWeird.Utility
         public static Dictionary<string, string> SystemInformation()
         {
             Dictionary<string, string> systemInfo = new Dictionary<string, string>();
-            
-            
+
+            systemInfo.Add("application_version", Constants.ApplicationVersion);
             systemInfo.Add("osversion", Environment.OSVersion.ToString());
             systemInfo.Add("clr_version", Environment.Version.ToString());
             systemInfo.Add("is_64bit_process", Environment.Is64BitProcess.ToString());
