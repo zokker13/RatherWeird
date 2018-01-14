@@ -64,10 +64,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="HotkeyManager.xaml.cs">
+      <DependentUpon>HotkeyManager.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Utility\Logger.cs" />
     <Compile Include="Utility\MemoryManipulator.cs" />
     <Compile Include="Utility\Networking.cs" />
     <Compile Include="Utility\Utility.cs" />
+    <Page Include="HotkeyManager.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
