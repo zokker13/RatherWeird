@@ -127,7 +127,7 @@ namespace RatherWeird
 
             _systemWatcher.Hook();
             _keyboardWatcher.HookKeyboard();
-            _mouseWatcher.HookMouse();
+            //_mouseWatcher.HookMouse();
 
             _systemWatcher.ForegroundChanged += SystemWatcherSystemChanged;
             _systemWatcher.ShowWindow += SystemWatcherOnShowWindow;
@@ -172,7 +172,16 @@ namespace RatherWeird
             POINT point = mouseInputArgs.Point;
             ScreenToClient(LatestRa3.MainWindowHandle, ref point);
 
-            // Title = point.ToString();
+            // test if that works but nope.. :(
+            if (point.X <= 2)
+            {
+                Messaging.SendMessage(LatestRa3.MainWindowHandle, (int)WM.KeyDown, 0x25, 0x14b0001);
+                Messaging.SendMessage(LatestRa3.MainWindowHandle, (int)WM.KeyUp, 0x25, 0xc14b0001);
+                //Messaging.InvokeKeyPress(LatestRa3.MainWindowHandle, (uint) Keys.Left);
+                Console.WriteLine("Invoked keypress");
+            }
+
+            //Title = point.ToString();
         }
 
         private void SystemWatcherOnHideWindow(object sender, ProcessArgs e)

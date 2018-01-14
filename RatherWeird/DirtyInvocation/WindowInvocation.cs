@@ -73,13 +73,25 @@ namespace DirtyInvocation
 
             return ClipCursor(ref lockPosition);
         }
-
+        
         public static void DropBorder(Process process)
         {
             long style = GetWindowLong(process.MainWindowHandle, (int)GwlIndex.GWL_STYLE);
 
             style &= ~((long) WindowStyles.WS_CAPTION | (long) WindowStyles.WS_MAXIMIZE | (long) WindowStyles.WS_MINIMIZE |
                        (long) WindowStyles.WS_SYSMENU);
+            
+
+            /* long standardStyle = (long) WindowStyles.WS_POPUP | (long) WindowStyles.WS_MINIMIZE | (long) WindowStyles.WS_VISIBLE |
+                     (long) WindowStyles.WS_CLIPSIBLINGS | (long) WindowStyles.WS_SYSMENU | 8;
+
+             long extendedStyle = (long) WindowStyles.WS_EX_LEFT | (long) WindowStyles.WS_EX_LTRREADING |
+                                  (long) WindowStyles.WS_EX_RIGHTSCROLLBAR | (long) WindowStyles.WS_EX_TOPMOST;
+
+            long standardStyle = (long)0xb4080008;
+            long extendedStyle = (long)8;
+            SetWindowLongPtr(process.MainWindowHandle, (int)GwlIndex.GWL_STYLE, standardStyle);
+            SetWindowLongPtr(process.MainWindowHandle, (int)GwlIndex.GWL_EXSTYLE, extendedStyle);*/
 
             SetWindowLongPtr(process.MainWindowHandle, (int) GwlIndex.GWL_STYLE, style);
         }
@@ -147,6 +159,13 @@ namespace DirtyInvocation
         WS_MAXIMIZEBOX = 0x00010000,
         WS_SIZEBOX = 0x00040000,
         WS_OVERLAPPED = 00000000,
+        WS_POPUP = 0x80000000L,
+        WS_VISIBLE = 0x10000000L,
+        WS_CLIPSIBLINGS = 0x04000000L,
+        WS_EX_LEFT = 0x00000000L,
+        WS_EX_LTRREADING = 0x00000000L,
+        WS_EX_RIGHTSCROLLBAR = 0x00000000L,
+        WS_EX_TOPMOST = 0x00000008L,
     };
 
     public struct RECT
