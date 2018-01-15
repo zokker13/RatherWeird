@@ -10,6 +10,7 @@ using System.Windows.Forms;
 
 namespace DirtyInvocation
 {
+
     public static class WindowInvocation
     {
         #region PInvokes 
@@ -128,6 +129,61 @@ namespace DirtyInvocation
                 return null;
 
             return Process.GetProcessById(procId);
+        }
+
+        public static Size GetClientSize(Process proc)
+        {
+            RECT rect;
+            GetWindowRect(proc.MainWindowHandle, out rect);
+            
+            Size size = new Size(rect);
+
+            return size;
+        }
+    }
+
+    public class Size
+    {
+        public int Left { get; set; }
+        public int Right { get; set; }
+        public int Bottom { get; set; }
+        public int Top { get; set; }
+        public int Height { get; set; }
+        public int Width { get; set; }
+
+        public Size(RECT rect) : this(rect.Left, rect.Right, rect.Top, rect.Bottom)
+        {
+            
+        }
+
+        public Size(int left, int right, int top, int bottom)
+        {
+            Left = left;
+            Right = right;
+            Top = top;
+            Bottom = bottom;
+
+            Width = Right - Left;
+            Height = Bottom - Top;
+        }
+
+        public bool IsPointInArea(int x, int y)
+        {
+            if (x < Left)
+                return false;
+            if (x > Right)
+                return false;
+            if (y < Top)
+                return false;
+            if (y > Bottom)
+                return false;
+
+            return true;
+        }
+
+        public override string ToString()
+        {
+            return $"L: {Left} R: {Right} T: {Top} B: {Bottom} - W: {Width} H: {Height}";
         }
     }
 

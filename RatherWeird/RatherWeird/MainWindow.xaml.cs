@@ -81,7 +81,7 @@ namespace RatherWeird
             if (settings.RemoveBorder)
             {
                 WindowInvocation.DropBorder(e.Process);
-                WindowInvocation.ResizeWindow(e.Process);
+                //WindowInvocation.ResizeWindow(e.Process);
                 Logger.Info("OK.. drop border and resize");
             }
 
@@ -127,7 +127,10 @@ namespace RatherWeird
 
             _systemWatcher.Hook();
             _keyboardWatcher.HookKeyboard();
-            //_mouseWatcher.HookMouse();
+
+#if DEBUG
+            _mouseWatcher.HookMouse();
+#endif
 
             _systemWatcher.ForegroundChanged += SystemWatcherSystemChanged;
             _systemWatcher.ShowWindow += SystemWatcherOnShowWindow;
@@ -171,18 +174,58 @@ namespace RatherWeird
             
             POINT point = mouseInputArgs.Point;
             ScreenToClient(LatestRa3.MainWindowHandle, ref point);
+            DirtyInvocation.Size size = WindowInvocation.GetClientSize(LatestRa3);
+            
+            if (!size.IsPointInArea(mouseInputArgs.Point.X, mouseInputArgs.Point.Y))
+                return;
 
+
+            
             // test if that works but nope.. :(
             if (point.X <= 2)
             {
-                Messaging.SendMessage(LatestRa3.MainWindowHandle, (int)WM.KeyDown, 0x25, 0x14b0001);
-                Messaging.SendMessage(LatestRa3.MainWindowHandle, (int)WM.KeyUp, 0x25, 0xc14b0001);
+                Messaging.SendMessage(LatestRa3.MainWindowHandle, (int) WM.KeyDown, 0x25, 0x14b0001);
+                needsKeyUp1 = true;
+                //Messaging.PostMessage(LatestRa3.MainWindowHandle, (int)WM.KeyDown, 0x25, 0x14b0001);
+                //Messaging.PostMessage(LatestRa3.MainWindowHandle, (int)WM.KeyUp, 0x25, 0xc14b0001);
                 //Messaging.InvokeKeyPress(LatestRa3.MainWindowHandle, (uint) Keys.Left);
-                Console.WriteLine("Invoked keypress");
+                //Console.WriteLine("Invoked keypress");
+                Console.WriteLine($"Left bound reached: {point}");
+            }
+            else
+            {
+                if (needsKeyUp1)
+                {
+                    Messaging.SendMessage(LatestRa3.MainWindowHandle, (int)WM.KeyUp, (uint)Keys.Right, 0xc14b0001);
+                    needsKeyUp1 = false;
+                }
+            }
+
+            if (size.Width - point.X <= 2)
+            {
+                Messaging.SendMessage(LatestRa3.MainWindowHandle, (int)WM.KeyDown, (uint)Keys.Right, 0x14D0001);
+                needsKeyUp2 = true;
+                //Messaging.PostMessage(LatestRa3.MainWindowHandle, (int)WM.KeyDown, 0x25, 0x14b0001);
+                //Messaging.PostMessage(LatestRa3.MainWindowHandle, (int)WM.KeyUp, 0x25, 0xc14b0001);
+                //Messaging.InvokeKeyPress(LatestRa3.MainWindowHandle, (uint) Keys.Left);
+                //Console.WriteLine("Invoked keypress");
+                Console.WriteLine($"Left bound reached: {point}");
+            }
+            else
+            {
+                if (needsKeyUp2)
+                {
+                    Messaging.SendMessage(LatestRa3.MainWindowHandle, (int)WM.KeyUp, (uint)Keys.Right, 0xc14D0001);
+                    needsKeyUp2 = false;
+                }
             }
 
             //Title = point.ToString();
         }
+
+        private bool needsKeyUp1 = false;
+        private bool needsKeyUp2 = false;
+
 
         private void SystemWatcherOnHideWindow(object sender, ProcessArgs e)
         {

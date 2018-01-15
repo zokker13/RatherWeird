@@ -12,9 +12,12 @@ namespace DirtyInvocation
     {
         // LPARAM = unsigned int
         // WPARAM = long
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = false)]
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern IntPtr SendMessage(IntPtr hWnd, int msg, uint wParam, long lParam);
-        
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern IntPtr PostMessage(IntPtr hWnd, int msg, uint wParam, long lParam);
+
         [Flags]
         public enum WM
         {
