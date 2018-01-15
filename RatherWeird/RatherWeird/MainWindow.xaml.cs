@@ -37,6 +37,15 @@ namespace RatherWeird
         [DllImport("user32.dll")]
         static extern bool ScreenToClient(IntPtr hWnd, ref POINT lpPoint);
 
+        [DllImport("user32.dll")]
+        static extern uint MapVirtualKey(uint uCode, uint uMapType);
+
+        const uint MAPVK_VK_TO_VSC = 0x00;
+        const uint MAPVK_VSC_TO_VK = 0x01;
+        const uint MAPVK_VK_TO_CHAR = 0x02;
+        const uint MAPVK_VSC_TO_VK_EX = 0x03;
+        const uint MAPVK_VK_TO_VSC_EX = 0x04;
+
         private readonly SystemWatcher _systemWatcher = new SystemWatcher();
         private readonly KeyboardWatcher _keyboardWatcher = new KeyboardWatcher();
         private readonly MouseWatcher _mouseWatcher = new MouseWatcher();
@@ -179,12 +188,20 @@ namespace RatherWeird
             if (!size.IsPointInArea(mouseInputArgs.Point.X, mouseInputArgs.Point.Y))
                 return;
 
+            uint scanCode = MapVirtualKey(0x25, MAPVK_VK_TO_VSC);
+            uint goodScanCode = scanCode << 16; // scancode is from 16-23, byte
+            uint extendedMessage = goodScanCode 
+                | 1         // Key repeating
+                | 1 << 24;  // is extended key = true
 
-            
+        
             // test if that works but nope.. :(
             if (point.X <= 2)
             {
-                Messaging.SendMessage(LatestRa3.MainWindowHandle, (int) WM.KeyDown, 0x25, 0x14b0001);
+                Title = extendedMessage.ToString("X8");
+                //Messaging.SendMessage(LatestRa3.MainWindowHandle, (int) WM.KeyDown, 0x25, 0x14b0001);
+                // HOLY FUCK THEY ARE MANAGING THE THING WITH KEYCODES.
+                Messaging.SendMessage(LatestRa3.MainWindowHandle, (int)WM.KeyDown, 0, extendedMessage);
                 needsKeyUp1 = true;
                 //Messaging.PostMessage(LatestRa3.MainWindowHandle, (int)WM.KeyDown, 0x25, 0x14b0001);
                 //Messaging.PostMessage(LatestRa3.MainWindowHandle, (int)WM.KeyUp, 0x25, 0xc14b0001);
@@ -196,7 +213,8 @@ namespace RatherWeird
             {
                 if (needsKeyUp1)
                 {
-                    Messaging.SendMessage(LatestRa3.MainWindowHandle, (int)WM.KeyUp, (uint)Keys.Right, 0xc14b0001);
+                    //Messaging.SendMessage(LatestRa3.MainWindowHandle, (int)WM.KeyUp, (uint)Keys.Right, 0xc14b0001);
+                    Messaging.SendMessage(LatestRa3.MainWindowHandle, (int)WM.KeyUp, 0, extendedMessage);
                     needsKeyUp1 = false;
                 }
             }
@@ -209,7 +227,7 @@ namespace RatherWeird
                 //Messaging.PostMessage(LatestRa3.MainWindowHandle, (int)WM.KeyUp, 0x25, 0xc14b0001);
                 //Messaging.InvokeKeyPress(LatestRa3.MainWindowHandle, (uint) Keys.Left);
                 //Console.WriteLine("Invoked keypress");
-                Console.WriteLine($"Left bound reached: {point}");
+                Console.WriteLine($"Right bound reached: {point}");
             }
             else
             {
