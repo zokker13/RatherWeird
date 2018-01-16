@@ -38,7 +38,7 @@ namespace RatherWeird
         static extern bool ScreenToClient(IntPtr hWnd, ref POINT lpPoint);
 
         [DllImport("user32.dll")]
-        static extern uint MapVirtualKey(uint uCode, uint uMapType);
+        static extern uint MapVirtualKeyEx(uint uCode, uint uMapType, IntPtr dwhkl);
 
         const uint MAPVK_VK_TO_VSC = 0x00;
         const uint MAPVK_VSC_TO_VK = 0x01;
@@ -181,69 +181,66 @@ namespace RatherWeird
             if (LatestRa3 == null)
                 return;
             
-            POINT point = mouseInputArgs.Point;
+            // Still need performance improvements since it's really bad right now :(
+            SimulateBorderScrolling(mouseInputArgs.Point);
+        }
+
+        // Im fucking ashamed :(
+        private bool needsKeyUp1 = false;
+        private bool needsKeyUp2 = false;
+        private bool needsKeyUp3 = false;
+        private bool needsKeyUp4 = false;
+
+        private void SimulateBorderScrolling(POINT origin)
+        {
+            POINT point = origin;
             ScreenToClient(LatestRa3.MainWindowHandle, ref point);
             DirtyInvocation.Size size = WindowInvocation.GetClientSize(LatestRa3);
             
-            if (!size.IsPointInArea(mouseInputArgs.Point.X, mouseInputArgs.Point.Y))
+
+            if (!size.IsPointInArea(origin.X, origin.Y))
                 return;
+            
+            var k = Keyboard.GetKeyStates(Key.Left);
+            Title = k.ToString();
 
-            uint scanCode = MapVirtualKey(0x25, MAPVK_VK_TO_VSC);
-            uint goodScanCode = scanCode << 16; // scancode is from 16-23, byte
-            uint extendedMessage = goodScanCode 
-                | 1         // Key repeating
-                | 1 << 24;  // is extended key = true
+            // I wanted to make it cool but it somewhat looks not so cool. :(
+            void Check(bool condition, Keys key, ref bool keyNeedsUp)
+            {
+                uint scanCode = MapVirtualKeyEx((uint)key, MAPVK_VK_TO_VSC, IntPtr.Zero);
+                uint goodScanCode = scanCode << 16; // scancode is from 16-23, byte
+                uint extendedMessage = goodScanCode
+                                       | 1          // Key repeating
+                                       | 1 << 24;   // is extended key = true
 
-        
-            // test if that works but nope.. :(
-            if (point.X <= 2)
-            {
-                Title = extendedMessage.ToString("X8");
-                //Messaging.SendMessage(LatestRa3.MainWindowHandle, (int) WM.KeyDown, 0x25, 0x14b0001);
-                // HOLY FUCK THEY ARE MANAGING THE THING WITH KEYCODES.
-                Messaging.SendMessage(LatestRa3.MainWindowHandle, (int)WM.KeyDown, 0, extendedMessage);
-                needsKeyUp1 = true;
-                //Messaging.PostMessage(LatestRa3.MainWindowHandle, (int)WM.KeyDown, 0x25, 0x14b0001);
-                //Messaging.PostMessage(LatestRa3.MainWindowHandle, (int)WM.KeyUp, 0x25, 0xc14b0001);
-                //Messaging.InvokeKeyPress(LatestRa3.MainWindowHandle, (uint) Keys.Left);
-                //Console.WriteLine("Invoked keypress");
-                Console.WriteLine($"Left bound reached: {point}");
-            }
-            else
-            {
-                if (needsKeyUp1)
+                if (condition)
                 {
-                    //Messaging.SendMessage(LatestRa3.MainWindowHandle, (int)WM.KeyUp, (uint)Keys.Right, 0xc14b0001);
-                    Messaging.SendMessage(LatestRa3.MainWindowHandle, (int)WM.KeyUp, 0, extendedMessage);
-                    needsKeyUp1 = false;
+                    Messaging.PostMessage(LatestRa3.MainWindowHandle, (int) WM.KeyDown, 0, extendedMessage);
+                    keyNeedsUp = true;
+                }
+                else
+                {
+                    if (keyNeedsUp)
+                    {
+                        Messaging.PostMessage(LatestRa3.MainWindowHandle, (int) WM.KeyUp, 0, extendedMessage);
+                        keyNeedsUp = false;
+                    }
                 }
             }
 
-            if (size.Width - point.X <= 2)
-            {
-                Messaging.SendMessage(LatestRa3.MainWindowHandle, (int)WM.KeyDown, (uint)Keys.Right, 0x14D0001);
-                needsKeyUp2 = true;
-                //Messaging.PostMessage(LatestRa3.MainWindowHandle, (int)WM.KeyDown, 0x25, 0x14b0001);
-                //Messaging.PostMessage(LatestRa3.MainWindowHandle, (int)WM.KeyUp, 0x25, 0xc14b0001);
-                //Messaging.InvokeKeyPress(LatestRa3.MainWindowHandle, (uint) Keys.Left);
-                //Console.WriteLine("Invoked keypress");
-                Console.WriteLine($"Right bound reached: {point}");
-            }
-            else
-            {
-                if (needsKeyUp2)
-                {
-                    Messaging.SendMessage(LatestRa3.MainWindowHandle, (int)WM.KeyUp, (uint)Keys.Right, 0xc14D0001);
-                    needsKeyUp2 = false;
-                }
-            }
+            // Left
+            Check(point.X <= Constants.Ra3InnerScrollBorderSize, Keys.Left, ref needsKeyUp1);   
 
-            //Title = point.ToString();
+            // Right
+            Check(size.Width - point.X <= Constants.Ra3InnerScrollBorderSize, Keys.Right, ref needsKeyUp2);
+
+            // Up
+            Check(point.Y <= Constants.Ra3InnerScrollBorderSize, Keys.Up, ref needsKeyUp3);
+
+            // Down
+            Check(size.Height - point.Y <= Constants.Ra3InnerScrollBorderSize, Keys.Down, ref needsKeyUp4);
+
         }
-
-        private bool needsKeyUp1 = false;
-        private bool needsKeyUp2 = false;
-
 
         private void SystemWatcherOnHideWindow(object sender, ProcessArgs e)
         {
