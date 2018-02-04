@@ -67,6 +67,7 @@
     <Compile Include="Utility\Logger.cs" />
     <Compile Include="Utility\MemoryManipulator.cs" />
     <Compile Include="Utility\Networking.cs" />
+    <Compile Include="Utility\Ra3HotkeySerializer.cs" />
     <Compile Include="Utility\Utility.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

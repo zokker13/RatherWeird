@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -37,6 +38,31 @@ namespace RatherWeird.Utility
                 Logger.Info($"{element.Key}: {element.Value}");
             }
             Logger.Info(Logger.Fillerline("=", 20));
+        }
+
+        public static async Task<string[]> ResolveProfileFolder()
+        {
+            string basePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Constants.Ra3ApplicationName, "Profiles");
+            
+            return await Task.Run(() =>
+            {
+                string[] targets;
+                string[] folders = Directory.GetDirectories(basePath);
+                if (folders.Length > 0)
+                {
+                    targets = new string[folders.Length];
+                    for (int i = 0; i < folders.Length; i++)
+                    {
+                        targets[i] = Path.Combine(basePath, folders[i]);
+                    }
+                }
+                else
+                {
+                    throw new Exception("No profile folder found");
+                }
+
+                return targets;
+            });
         }
         
     }

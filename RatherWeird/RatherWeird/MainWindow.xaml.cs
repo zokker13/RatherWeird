@@ -448,5 +448,14 @@ namespace RatherWeird
             }
 
         }
+
+        private async void Button_Click(object sender, RoutedEventArgs e)
+        {
+            string[] folders = await Utility.Utility.ResolveProfileFolder();
+
+            string hotkeyFile = Path.Combine(folders[0], Constants.HotkeyFileName);
+            Ra3HotkeyData data = await Ra3HotkeySerializer.ReadHotkeyFile(hotkeyFile);
+
+        }
     }
 }
