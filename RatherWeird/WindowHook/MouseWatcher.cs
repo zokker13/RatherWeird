@@ -86,8 +86,11 @@ namespace WindowHook
             , uint dwThreadId
         );
 
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern IntPtr GetModuleHandle(string lpModuleName);
+
         #endregion
-       
+
         public event MouseInputChangeHandler MouseInputChanged;
 
         public bool HookRegistered { get; private set; }
@@ -136,7 +139,9 @@ namespace WindowHook
 
             };
 
-            HHook = SetWindowsHookEx(HookType.WH_MOUSE_LL, _del, IntPtr.Zero, 0);
+            IntPtr handle = GetModuleHandle(Process.GetCurrentProcess().MainModule.ModuleName);
+
+            HHook = SetWindowsHookEx(HookType.WH_MOUSE_LL, _del, handle, 0);
 
             if (HHook == IntPtr.Zero)
             {
