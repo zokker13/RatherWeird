@@ -103,6 +103,83 @@ namespace RatherWeird.Utility
             return data;
         }
     }
+
+    public enum Ra3Key
+    {
+        KEY_NONE = Keys.None,
+        KEY_A = Keys.A,
+        KEY_B = Keys.B,
+        KEY_C = Keys.C,
+        KEY_D = Keys.D,
+        KEY_E = Keys.E,
+        KEY_F = Keys.F,
+        KEY_G = Keys.G,
+        KEY_H = Keys.H,
+        KEY_I = Keys.I,
+        KEY_J = Keys.J,
+        KEY_K = Keys.K,
+        KEY_L = Keys.L,
+        KEY_M = Keys.M,
+        KEY_N = Keys.N,
+        KEY_O = Keys.O,
+        KEY_P = Keys.P,
+        KEY_Q = Keys.Q,
+        KEY_R = Keys.R,
+        KEY_S = Keys.S,
+        KEY_T = Keys.T,
+        KEY_U = Keys.U,
+        KEY_V = Keys.V,
+        KEY_W = Keys.W,
+        KEY_X = Keys.X,
+        KEY_Y = Keys.Y,
+        KEY_Z = Keys.Z,
+        KEY_F1 = Keys.F1,
+        KEY_F2 = Keys.F2,
+        KEY_F3 = Keys.F3,
+        KEY_F4 = Keys.F4,
+        KEY_F5 = Keys.F5,
+        KEY_F6 = Keys.F6,
+        KEY_F7 = Keys.F7,
+        KEY_F8 = Keys.F8,
+        KEY_F9 = Keys.F9,
+        KEY_F10 = Keys.F10,
+        KEY_F11 = Keys.F11,
+        KEY_F12 = Keys.F12,
+        KEY_F13 = Keys.F13,
+        KEY_F14 = Keys.F14,
+        KEY_F15 = Keys.F15,
+        KEY_F16 = Keys.F16,
+        KEY_F17 = Keys.F17,
+        KEY_F18 = Keys.F18,
+        KEY_F19 = Keys.F19,
+        KEY_F20 = Keys.F20,
+        KEY_F21 = Keys.F21,
+        KEY_F22 = Keys.F22,
+        KEY_F23 = Keys.F23,
+        KEY_F24 = Keys.F24,
+        ALT = Keys.LMenu,
+        SHIFT = Keys.Shift,
+        //KEY_TICK = 
+        KEY_SPACE = Keys.Space,
+        KEY_DEL = Keys.Delete,
+        KEY_PGUP = Keys.PageUp,
+        KEY_PGDN = Keys.PageDown,
+        KEY_HOME = Keys.Home,
+        KEY_PERIOD = Keys.OemPeriod, // TODO: CHECK
+        KEY_END = Keys.End,
+        CTRL = Keys.ControlKey, // TODO: NEED REFINEMENT?
+        KEY_INS = Keys.Insert,
+        KEY_TAB = Keys.Tab,
+        KEY_BACKSPACE = Keys.Back,
+        KEY_KP5 = 42, // middle mouse
+        KEY_KP4 = 42, // ??
+        KEY_KP6 = 42, // ??
+        KEY_DOWN = Keys.Down,
+        KEY_UP= Keys.Up,
+        KEY_LEFT = Keys.Left,
+        KEY_RIGHT = Keys.Right,
+        KEY_ENTER = Keys.Enter,
+    };
     
     public class Ra3HotkeyData
     {
