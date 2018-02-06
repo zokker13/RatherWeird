@@ -37,9 +37,33 @@ namespace RatherWeird.Utility
         public bool IsInvisible;
         public string Category;
     }
-    
+
+    [AttributeUsage(AttributeTargets.Field)]
+    public sealed class HotkeyModifierAttribute : Attribute
+    {
+        public HotkeyModifierAttribute()
+        {
+            IsModifier = false;
+        }
+
+        public HotkeyModifierAttribute(bool isModifier)
+        {
+            IsModifier = isModifier;
+        }
+
+        public bool IsModifier;
+    }
+
     public class Ra3HotkeySerializer
     {
+        private static readonly Dictionary<string, Keys> _Ra3Keys = new Dictionary<string, Keys>();
+
+        private static void SetupKeys()
+        {
+            _Ra3Keys.Clear();
+            _Ra3Keys.Add("KEY_A", Keys.A);
+        }
+
         private static PropertyInfo GetCorrectProperty(string key)
         {
             var props = typeof(Ra3HotkeyData).GetProperties();
@@ -48,7 +72,7 @@ namespace RatherWeird.Utility
                 PropertyInfo prop = props[i];
                 HotkeyNameAttribute att =
                     (HotkeyNameAttribute) Attribute.GetCustomAttribute(prop, typeof(HotkeyNameAttribute));
-
+                
                 if (att != null && att.HotkeyName == key)
                 {
                     return prop;
@@ -62,6 +86,7 @@ namespace RatherWeird.Utility
 
         public static async Task<Ra3HotkeyData> ReadHotkeyFile(string path)
         {
+            SetupKeys();
             Ra3HotkeyData data = new Ra3HotkeyData();
             
             foreach (var propertyInfo in typeof(Ra3HotkeyData).GetProperties())
@@ -74,7 +99,6 @@ namespace RatherWeird.Utility
                     : att.HotkeyName;
                 
             }
-            
 
             using (StreamReader sr = File.OpenText(path))
             {
@@ -87,9 +111,19 @@ namespace RatherWeird.Utility
                         string[] elements = line.Split('=');
                         string key = elements[0].Trim();
                         string value = elements[1].Trim();
+                        string[] keys = value.Split(' ');
 
                         PropertyInfo property = GetCorrectProperty(key);
-
+                        List<Keys> defaultkeys = new List<Keys>();
+                        foreach (string rawKey in keys)
+                        {
+                            if (_Ra3Keys.ContainsKey(rawKey))
+                            {
+                                Console.WriteLine("pewpew");
+                                defaultkeys.Add(_Ra3Keys[rawKey]);
+                            }
+                        }
+                        
 
                         // Console.WriteLine($"-> {key}: {value}");
 
@@ -157,28 +191,31 @@ namespace RatherWeird.Utility
         KEY_F22 = Keys.F22,
         KEY_F23 = Keys.F23,
         KEY_F24 = Keys.F24,
-        ALT = Keys.LMenu,
-        SHIFT = Keys.Shift,
-        //KEY_TICK = 
+        KEY_TICK = Keys.Oem5,
         KEY_SPACE = Keys.Space,
         KEY_DEL = Keys.Delete,
         KEY_PGUP = Keys.PageUp,
         KEY_PGDN = Keys.PageDown,
         KEY_HOME = Keys.Home,
-        KEY_PERIOD = Keys.OemPeriod, // TODO: CHECK
+        KEY_PERIOD = Keys.OemPeriod,
         KEY_END = Keys.End,
-        CTRL = Keys.ControlKey, // TODO: NEED REFINEMENT?
         KEY_INS = Keys.Insert,
         KEY_TAB = Keys.Tab,
         KEY_BACKSPACE = Keys.Back,
-        KEY_KP5 = 42, // middle mouse
-        KEY_KP4 = 42, // ??
-        KEY_KP6 = 42, // ??
+        KEY_KP5 = Keys.NumPad5,
+        KEY_KP4 = Keys.NumPad4,
+        KEY_KP6 = Keys.NumPad6,
         KEY_DOWN = Keys.Down,
         KEY_UP= Keys.Up,
         KEY_LEFT = Keys.Left,
         KEY_RIGHT = Keys.Right,
         KEY_ENTER = Keys.Enter,
+        [HotkeyModifier(true)]
+        ALT = Keys.Menu,
+        [HotkeyModifier(true)]
+        SHIFT = Keys.Shift,
+        [HotkeyModifier(true)]
+        CTRL = Keys.ControlKey,
     };
     
     public class Ra3HotkeyData
