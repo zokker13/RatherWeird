@@ -5,8 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RatherWeird"
         mc:Ignorable="d"
-        Title="RatherWeird" Height="244.521" Width="534" Loaded="Window_Loaded" Closed="Window_Closed" ResizeMode="CanMinimize" Icon="dunno_man.ico">
-    <Grid>
+        Title="RatherWeird" Height="283.521" Width="534" Loaded="Window_Loaded" Closed="Window_Closed" ResizeMode="CanMinimize" Icon="dunno_man.ico" Closing="Window_Closing">
+    <DockPanel LastChildFill="True">
+        <StatusBar Name="statusbar" DockPanel.Dock="Bottom">
+            <Button Name="btnShowPlayers" Content="Show Players" Margin="10, 2, 0,2" Padding="5" Click="btnShowPlayers_Click"></Button>
+        </StatusBar>
+
+        <Grid Margin="0,0,4,0">
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
@@ -113,4 +118,5 @@
             </Grid>
         </GroupBox>
     </Grid>
+    </DockPanel>
 </Window>
