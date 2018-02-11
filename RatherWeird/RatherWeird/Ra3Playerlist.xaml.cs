@@ -30,6 +30,7 @@ namespace RatherWeird
     {
         private CancellationTokenSource _tokenSource;
         private readonly ObservableCollection<User> _ra3Users = new ObservableCollection<User>();
+        
         public Ra3Playerlist()
         {
             InitializeComponent();
@@ -37,7 +38,7 @@ namespace RatherWeird
             lstView.ItemsSource = _ra3Users;
         }
 
-        public void LaunchReoccuringTask()
+        public void StartReoccuringTask()
         {
             _tokenSource = new CancellationTokenSource();
 
@@ -45,10 +46,10 @@ namespace RatherWeird
             {
                 CncGeneralInfo info = await GatherData();
                 InsertData(info);
-                await Task.Delay(1000 * 60, _tokenSource.Token).ContinueWith(_2 => Repeated(_2), _tokenSource.Token);
+                await Task.Delay(1000 * 60, _tokenSource.Token).ContinueWith(Repeated, _tokenSource.Token);
             }
 
-            Task.Delay(1000, _tokenSource.Token).ContinueWith((Action<Task>) Repeated, _tokenSource.Token);
+            Task.Delay(1000, _tokenSource.Token).ContinueWith(Repeated, _tokenSource.Token);
         }
 
         public void StopReoccuringTask()
@@ -75,30 +76,48 @@ namespace RatherWeird
 
         }
 
+        private int _oldPlayerCount;
         private void InsertData(CncGeneralInfo info)
         {
+            _oldPlayerCount = _ra3Users.Count;
             lstView.Dispatcher.Invoke(() =>
             {
-                foreach (var ra3User in info.Ra3.Users)
+                var newEntries = info.Ra3.Users.Values.Except(_ra3Users);
+                var oldEntries = _ra3Users.Except(info.Ra3.Users.Values);
+                foreach (var newEntry in newEntries)
                 {
-                    if (!_ra3Users.Contains(ra3User.Value))
-                    {
-                        _ra3Users.Add(ra3User.Value);
-                    }
+                    AddSorted(_ra3Users, newEntry);
                 }
 
-
-                for (int i = _ra3Users.Count - 1; i <= 0; i--)
+                foreach (var o in oldEntries.ToList())
                 {
-                    if (!info.Ra3.Users.Values.Contains(_ra3Users[i]))
-                    {
-                        _ra3Users.RemoveAt(i);
-                    }
+                    _ra3Users.Remove(o);
                 }
             });
+
+            lstView.Dispatcher.Invoke(() =>
+            {
+                if (_oldPlayerCount != _ra3Users.Count)
+                {
+                    lblPlayers.Content = $"Players: {_ra3Users.Count}";
+                }
+            });
+
         }
-        
+
+        public static void AddSorted<T>(IList<T> list, T item)
+            where T : IComparable
+        {
+            int i = 0;
+            while (i < list.Count && item.CompareTo(list[i]) > 0)
+                i++;
+
+            list.Insert(i, item);
+        }
+
     }
+
+
     
     [DataContract]
     internal class CncGeneralInfo
@@ -143,7 +162,7 @@ namespace RatherWeird
     }
 
     [DataContract]
-    internal class User
+    internal class User : IComparable
     {
         [DataMember(Name = "id")]
         public int Id { get; set; }
@@ -188,6 +207,30 @@ namespace RatherWeird
 
             return true;
         }
+
+        public int CompareTo(object obj)
+        {
+            User other = obj as User;
+            if (other == null)
+            {
+                return 0;
+            }
+
+            int iNickname = String.Compare(Nickname, other.Nickname, StringComparison.InvariantCulture);
+            if (iNickname != 0)
+                return iNickname;
+
+            int iId = Id.CompareTo(other.Id);
+            if (iId != 0)
+                return iId;
+
+            int iPid = Pid.CompareTo(other.Pid);
+            if (iPid != 0)
+                return iPid;
+
+            return 0;
+        }
+
     }
 
     [DataContract]
