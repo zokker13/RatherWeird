@@ -50,6 +50,8 @@ namespace RatherWeird
         private readonly KeyboardWatcher _keyboardWatcher = new KeyboardWatcher();
         private readonly MouseWatcher _mouseWatcher = new MouseWatcher();
         private readonly MemoryManipulator _memoryManipulator = new MemoryManipulator();
+
+        private readonly OnlinePlayers _onlinePlayers = new OnlinePlayers();
         
         private Process _latestRa3 = null;
 
@@ -160,8 +162,6 @@ namespace RatherWeird
 
             Logger.Info("OK.. application launch");
             // tmr.Start();
-
-            ra3PlayerStats.LaunchReoccuringTask();
         }
 
         private void RemoveLog()
@@ -318,7 +318,6 @@ namespace RatherWeird
             _keyboardWatcher.UnhookKeyboard();
             _mouseWatcher.UnhookMouse();
             _memoryManipulator.LockProcess();
-            ra3PlayerStats.StopReoccuringTask();
 
             Preferences.Write(settings);
         }
@@ -508,6 +507,16 @@ namespace RatherWeird
                 settings.RefreshPathToRa3 = false;
             }
 
+        }
+        
+        private void btnShowPlayers_Click(object sender, RoutedEventArgs e)
+        {
+            _onlinePlayers.Show();
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            _onlinePlayers.ProperlyClose();
         }
     }
 }

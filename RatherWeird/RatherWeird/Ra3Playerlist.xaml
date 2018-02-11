@@ -8,13 +8,14 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
         <Grid>
-            <ListView x:Name="lstView" Margin="10">
+            <ListView x:Name="lstView" Margin="10,26,10,10">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Header="Nickname" Width="120" DisplayMemberBinding="{Binding Nickname}" />
                     </GridView>
                 </ListView.View>
             </ListView>
+            <Label x:Name="lblPlayers" Content="Players: ??" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top"/>
         </Grid>
 
     </Grid>
