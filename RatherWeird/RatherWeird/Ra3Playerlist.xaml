@@ -11,7 +11,7 @@
             <ListView x:Name="lstView" Margin="10">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="Playername" Width="120" DisplayMemberBinding="{Binding Nickname}" />
+                        <GridViewColumn Header="Nickname" Width="120" DisplayMemberBinding="{Binding Nickname}" />
                     </GridView>
                 </ListView.View>
             </ListView>

@@ -29,7 +29,7 @@ namespace RatherWeird
     public partial class Ra3Playerlist : UserControl
     {
         private CancellationTokenSource _tokenSource;
-        private ObservableCollection<User> _ra3Users = new ObservableCollection<User>();
+        private readonly ObservableCollection<User> _ra3Users = new ObservableCollection<User>();
         public Ra3Playerlist()
         {
             InitializeComponent();
@@ -79,7 +79,7 @@ namespace RatherWeird
         {
             lstView.Dispatcher.Invoke(() =>
             {
-                foreach (var ra3User in info.ra3.users)
+                foreach (var ra3User in info.Ra3.Users)
                 {
                     if (!_ra3Users.Contains(ra3User.Value))
                     {
@@ -90,100 +90,74 @@ namespace RatherWeird
 
                 for (int i = _ra3Users.Count - 1; i <= 0; i--)
                 {
-                    if (!info.ra3.users.Values.Contains(_ra3Users[i]))
+                    if (!info.Ra3.Users.Values.Contains(_ra3Users[i]))
                     {
                         _ra3Users.RemoveAt(i);
                     }
                 }
             });
         }
-
-        private void GetResponseCallback(IAsyncResult asynchronousResult)
-        {
-            try
-            {
-                WebRequest req = (WebRequest) asynchronousResult.AsyncState;
-                WebResponse resp = req.EndGetResponse(asynchronousResult);
-                HttpWebResponse response = (HttpWebResponse) resp;
-                Stream streamResponse = response.GetResponseStream();
-                StreamReader streamRead = new StreamReader(streamResponse);
-                string responseString = streamRead.ReadToEnd();
-                // Close the stream object
-                streamResponse.Close();
-                streamRead.Close();
-                // Release the HttpWebResponse
-                response.Close();
-
-                //Do whatever you want with the returned "responseString"
-                CncGeneralInfo info = JsonConvert.DeserializeObject<CncGeneralInfo>(responseString);
-                
-               
-                
-
-            }
-            catch (Exception err)
-            {
-                Console.WriteLine($"Sux: {err}");
-            }
-        }
-        internal static CncGeneralInfo ReadToObject(string json)
-        {
-            CncGeneralInfo deserializedUser = new CncGeneralInfo();
-            MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(json));
-            DataContractJsonSerializer ser = new DataContractJsonSerializer(deserializedUser.GetType());
-            deserializedUser = ser.ReadObject(ms) as CncGeneralInfo;
-            ms.Close();
-            return deserializedUser;
-        }
+        
     }
-
-    public class Player
-    {
-        public string Name { get; set; }
-    }
-
+    
     [DataContract]
     internal class CncGeneralInfo
     {
-        [DataMember] internal Game bfme;
-        [DataMember] internal Game bfme2;
-        [DataMember] internal Game cnc3;
-        [DataMember] internal Game cnc3kw;
-        [DataMember] internal Game generals;
-        [DataMember] internal Game generalszh;
-        [DataMember] internal Game ra3;
-        [DataMember] internal Game rotwk;
-
-        public override string ToString()
-        {
-            return "Game: " + ra3.users.Keys.Count;
-        }
+        [DataMember(Name = "bfme")]
+        public Game Bfme { get; set; }
+        [DataMember(Name = "bfme2")]
+        public Game Bfme2 { get; set; }
+        [DataMember(Name = "cnc3")]
+        public Game Cnc3 { get; set; }
+        [DataMember(Name = "cnc3kw")]
+        public Game Cnc3Kw { get; set; }
+        [DataMember(Name = "generals")]
+        public Game Generals { get; set; }
+        [DataMember(Name = "generalzh")]
+        public Game Generalszh { get; set; }
+        [DataMember(Name = "ra3")]
+        public Game Ra3 { get; set; }
+        [DataMember(Name = "rotwk")]
+        public Game Rotwk { get; set; }
     }
 
     [DataContract]
     internal class Game
     {
-        [DataMember] internal Lobby lobbies;
-        [DataMember] internal IDictionary<string, User> users;
-        [DataMember] internal MetaMatch games;
+        [DataMember(Name = "lobbies")]
+        public Lobby Lobbies { get; set; }
+        [DataMember(Name = "users")]
+        public IDictionary<string, User> Users { get; set; }
+        [DataMember(Name = "games")]
+        public MetaMatch Games { get; set; }
     }
     [DataContract]
     internal class Lobby
     {
-        [DataMember] internal int chat;
-        [DataMember] internal int hosting;
-        [DataMember] internal int playing;
+        [DataMember(Name = "chat")]
+        public int Chat { get; set; }
+        [DataMember(Name = "hosting")]
+        public int Hosting { get; set; }
+        [DataMember(Name = "playing")]
+        public int Playing { get; set; }
     }
 
     [DataContract]
     internal class User
     {
-        [DataMember] internal int id;
-        [DataMember] internal string nickname;
-        [DataMember] internal int pid;
-
-        public string Nickname => nickname;
+        [DataMember(Name = "id")]
+        public int Id { get; set; }
+        [DataMember(Name = "pid")]
+        public int Pid { get; set; }
         
+        [DataMember(Name = "nickname")]
+        public string Nickname { get; set; }
+
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode() ^ Nickname.GetHashCode() ^ Pid.GetHashCode();
+        }
+
         public override bool Equals(object obj)
         {
             var other = obj as User;
@@ -197,17 +171,17 @@ namespace RatherWeird
                 return true;
             }
 
-            if (!other.id.Equals(id))
+            if (!other.Id.Equals(Id))
             {
                 return false;
             }
 
-            if (!other.pid.Equals(pid))
+            if (!other.Pid.Equals(Pid))
             {
                 return false;
             }
 
-            if (!other.nickname.Equals(nickname))
+            if (!other.Nickname.Equals(Nickname))
             {
                 return false;
             }
@@ -219,29 +193,48 @@ namespace RatherWeird
     [DataContract]
     internal class MetaMatch
     {
-        [DataMember] internal Match[] playing;
-        [DataMember] internal Match[] staging;
+        [DataMember(Name = "playing")]
+        public Match[] Playing { get; set; }
+        [DataMember(Name = "staging")]
+        public Match[] Staging { get; set; }
     }
 
     [DataContract]
     internal class Match
     {
-        [DataMember] internal string cmdCRC;
-        [DataMember] internal string exeCRC;
-        [DataMember] internal string gamever;
-        [DataMember] internal User host;
-        [DataMember] internal string iniCRC;
-        [DataMember] internal string map;
-        [DataMember] internal string maxRealPlayers;
-        [DataMember] internal string maxplayers;
-        [DataMember] internal string numObservers;
-        [DataMember] internal string numRealPlayers;
-        [DataMember] internal string numplayers;
-        [DataMember] internal string obs;
-        [DataMember] internal string pings;
-        [DataMember] internal string pw;
-        [DataMember] internal string title;
-        [DataMember] internal string version;
-        [DataMember] internal User[] players;
+        [DataMember(Name = "cmdCRC")]
+        public string CmdCRC { get; set; }
+        [DataMember(Name = "exeCRC")]
+        public string ExeCRC { get; set; }
+        [DataMember(Name = "gamever")]
+        public string Gamever { get; set; }
+        [DataMember(Name = "host")]
+        public User Host { get; set; }
+        [DataMember(Name = "iniCRC")]
+        public string IniCRC { get; set; }
+        [DataMember(Name = "map")]
+        public string Map { get; set; }
+        [DataMember(Name = "maxRealPlayers")]
+        public string MaxRealPlayers { get; set; }
+        [DataMember(Name = "maxplayers")]
+        public string Maxplayers { get; set; }
+        [DataMember(Name = "numObservers")]
+        public string NumObservers { get; set; }
+        [DataMember(Name = "numRealPlayers")]
+        public string NumRealPlayers { get; set; }
+        [DataMember(Name = "numplayers")]
+        public string Numplayers { get; set; }
+        [DataMember(Name = "obs")]
+        public string Obs { get; set; }
+        [DataMember(Name = "pings")]
+        public string Pings { get; set; }
+        [DataMember(Name = "pw")]
+        public string Pw { get; set; }
+        [DataMember(Name = "title")]
+        public string Title { get; set; }
+        [DataMember(Name = "version")]
+        public string Version { get; set; }
+        [DataMember(Name = "players")]
+        public User[] Players { get; set; }
     }
 }

@@ -160,7 +160,7 @@ namespace RatherWeird
                 {
                 }
             }
-            catch (IOException ex)
+            catch (IOException)
             {
                 // Good
             }
