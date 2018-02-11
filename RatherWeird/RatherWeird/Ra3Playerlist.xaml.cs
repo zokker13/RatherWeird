@@ -17,8 +17,10 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
+using System.Security;
 using System.Threading;
 using Newtonsoft.Json;
+using RatherWeird.Utility;
 
 namespace RatherWeird
 {
@@ -40,10 +42,12 @@ namespace RatherWeird
 
         public void StartReoccuringTask()
         {
+            Logger.Info("Starting Reoccuring task");
             _tokenSource = new CancellationTokenSource();
 
             async void Repeated(Task _)
             {
+                Logger.Debug("Attempting to download and insert player statistics");
                 CncGeneralInfo info = await GatherData();
                 InsertData(info);
                 await Task.Delay(1000 * 60, _tokenSource.Token).ContinueWith(Repeated, _tokenSource.Token);
@@ -54,24 +58,46 @@ namespace RatherWeird
 
         public void StopReoccuringTask()
         {
+            Logger.Info("Stopping Reoccuring task for shutdown");
             _tokenSource.Cancel();
         }
 
         private async Task<CncGeneralInfo> GatherData()
         {
-            CncGeneralInfo info;
-            WebRequest req = WebRequest.CreateHttp(Constants.CncOnlinePlayerInfo);
+            CncGeneralInfo info = new CncGeneralInfo();
 
-            var res = await req.GetResponseAsync();
-            HttpWebResponse response = (HttpWebResponse) res;
-
-            using (Stream streamResponse = response.GetResponseStream())
-            using (StreamReader sr = new StreamReader(streamResponse))
+            try
             {
-                string body = sr.ReadToEnd();
-                info = JsonConvert.DeserializeObject<CncGeneralInfo>(body);
+                WebRequest req = WebRequest.CreateHttp(Constants.CncOnlinePlayerInfo);
+
+                var res = await req.GetResponseAsync();
+                HttpWebResponse response = (HttpWebResponse) res;
+
+                using (Stream streamResponse = response.GetResponseStream())
+                using (StreamReader sr =
+                    new StreamReader(streamResponse ?? throw new InvalidOperationException("streamResponse was null")))
+                {
+                    string body = await sr.ReadToEndAsync();
+                    info = JsonConvert.DeserializeObject<CncGeneralInfo>(body);
+                }
             }
-            
+            catch (SecurityException err)
+            {
+                Logger.Error($"ER.. Could not connect to Server due to permission issues. err: {err.Message}");
+            }
+            catch (ProtocolViolationException err)
+            {
+                Logger.Error($"ER.. Could not get any response stream. err: {err.Message}");
+            }
+            catch (InvalidOperationException err)
+            {
+                Logger.Error($"ER.. Seems like the responsestream was null for some reason. err: {err.Message}");
+            }
+            catch (Exception err)
+            {
+                Logger.Fatal($"ER.. Seems like something unexpected happened. err: {err.Message}");
+            }
+
             return info;
 
         }
@@ -102,7 +128,6 @@ namespace RatherWeird
                     lblPlayers.Content = $"Players: {_ra3Users.Count}";
                 }
             });
-
         }
 
         public static void AddSorted<T>(IList<T> list, T item)

@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using RatherWeird.Utility;
 
 namespace RatherWeird
 {
@@ -41,6 +42,7 @@ namespace RatherWeird
             {
                 e.Cancel = true;
                 Hide();
+                Logger.Debug("Closing of playerwindow was supressed");
             }
         }
 
