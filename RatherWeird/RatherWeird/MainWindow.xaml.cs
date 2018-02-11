@@ -160,6 +160,8 @@ namespace RatherWeird
 
             Logger.Info("OK.. application launch");
             // tmr.Start();
+
+            ra3PlayerStats.LaunchReoccuringTask();
         }
 
         private void RemoveLog()
@@ -316,6 +318,7 @@ namespace RatherWeird
             _keyboardWatcher.UnhookKeyboard();
             _mouseWatcher.UnhookMouse();
             _memoryManipulator.LockProcess();
+            ra3PlayerStats.StopReoccuringTask();
 
             Preferences.Write(settings);
         }
