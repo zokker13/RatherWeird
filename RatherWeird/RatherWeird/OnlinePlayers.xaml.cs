@@ -26,19 +26,9 @@ namespace RatherWeird
             InitializeComponent();
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            ra3Players.StartReoccuringTask();
-        }
-
-        private void Window_Unloaded(object sender, RoutedEventArgs e)
-        {
-            ra3Players.StopReoccuringTask();
-        }
-
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (_stopClosing)
+           if (_stopClosing)
             {
                 e.Cancel = true;
                 Hide();
@@ -51,6 +41,26 @@ namespace RatherWeird
             _stopClosing = false;
 
             Close();
+        }
+
+        public new void Hide()
+        {
+            ra3Players.StopReoccuringTask();
+            base.Hide();
+        }
+
+        public new void Show()
+        {
+            if (Visibility == Visibility.Visible)
+            {
+                Activate();
+            }
+            else
+            {
+                ra3Players.StartReoccuringTask();
+                base.Show();
+            }
+            
         }
     }
 }
