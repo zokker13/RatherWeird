@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RatherWeird"
         mc:Ignorable="d"
-        Title="OnlinePlayers" Height="426.89" Width="296.639" Loaded="Window_Loaded" Unloaded="Window_Unloaded" Closing="Window_Closing">
+        Title="OnlinePlayers" Height="426.89" Width="296.639" Closing="Window_Closing">
     <Grid>
         <local:Ra3Playerlist x:Name="ra3Players"/>
     </Grid>

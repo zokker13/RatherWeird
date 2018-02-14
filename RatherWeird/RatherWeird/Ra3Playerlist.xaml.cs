@@ -42,24 +42,33 @@ namespace RatherWeird
 
         public void StartReoccuringTask()
         {
-            Logger.Info("Starting Reoccuring task");
-            _tokenSource = new CancellationTokenSource();
-
-            async void Repeated(Task _)
+            if (_tokenSource != null && !_tokenSource.IsCancellationRequested)
             {
-                Logger.Debug("Attempting to download and insert player statistics");
-                CncGeneralInfo info = await GatherData();
-                InsertData(info);
-                await Task.Delay(1000 * 60, _tokenSource.Token).ContinueWith(Repeated, _tokenSource.Token);
+                // previous task was *NOT* cancelled so we just go home here
+                Logger.Debug("Attempted to start a second task but that was supressed (misuse and such)");
+                return;
             }
 
-            Task.Delay(1000, _tokenSource.Token).ContinueWith(Repeated, _tokenSource.Token);
+            Logger.Info("Starting Reoccuring task");
+            _tokenSource = new CancellationTokenSource();
+            _tokenSource.Token.ThrowIfCancellationRequested();
+            Task.Run(async () =>
+            {
+                while (!_tokenSource.IsCancellationRequested)
+                {
+                    Logger.Debug("Attempting to download and insert player statistics");
+                    CncGeneralInfo info = await GatherData();
+                    InsertData(info);
+                    Thread.Sleep(1000 * 60);
+                }
+            }, _tokenSource.Token);
         }
 
         public void StopReoccuringTask()
         {
             Logger.Info("Stopping Reoccuring task for shutdown");
             _tokenSource.Cancel();
+            _tokenSource.Dispose();
         }
 
         private async Task<CncGeneralInfo> GatherData()
@@ -72,6 +81,12 @@ namespace RatherWeird
 
                 var res = await req.GetResponseAsync();
                 HttpWebResponse response = (HttpWebResponse) res;
+
+                if (response.StatusCode != HttpStatusCode.OK)
+                {
+                    Logger.Error($"ER.. Could not get a proper status. Statuscode was ${response.StatusCode}");
+                    return info;
+                }
 
                 using (Stream streamResponse = response.GetResponseStream())
                 using (StreamReader sr =
