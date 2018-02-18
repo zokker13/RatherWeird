@@ -66,8 +66,8 @@ namespace RatherWeird
                     _memoryManipulator.LockProcess();
 
                     _memoryManipulator.UnlockProcess(LatestRa3,
-                        MemoryManipulator.ProcessAccessFlags.VirtualMemoryWrite |
-                        MemoryManipulator.ProcessAccessFlags.VirtualMemoryOperation);
+                        Pinvokes.ProcessAccessFlags.VirtualMemoryWrite |
+                        Pinvokes.ProcessAccessFlags.VirtualMemoryOperation);
 
                     SwapHealthbarLogic();
                 }

@@ -70,6 +70,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Inputs.cs" />
+    <Compile Include="ManagedPinvokes.cs" />
     <Compile Include="OnlinePlayers.xaml.cs">
       <DependentUpon>OnlinePlayers.xaml</DependentUpon>
     </Compile>

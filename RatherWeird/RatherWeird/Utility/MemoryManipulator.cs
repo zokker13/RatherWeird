@@ -18,51 +18,16 @@ namespace RatherWeird.Utility
 
     public class MemoryManipulator
     {
-        // Stolen from pinvoke: http://www.pinvoke.net/default.aspx/kernel32/OpenProcess.html
-        [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern IntPtr OpenProcess(ProcessAccessFlags processAccess, bool bInheritHandle, int processId);
-
-        // Stolen from: http://www.pinvoke.net/default.aspx/kernel32/CloseHandle.html
-        [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern bool CloseHandle(IntPtr hObject);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern bool WriteProcessMemory(
-            IntPtr hProcess,
-            IntPtr lpBaseAddress,
-            byte[] lpBuffer,
-            uint nSize,
-            out uint lpNumberOfBytesWritten);
-        
-
-        // Stolen from pinvoke: http://www.pinvoke.net/default.aspx/kernel32/OpenProcess.html
-        [Flags]
-        public enum ProcessAccessFlags : uint
-        {
-            All = 0x001F0FFF,
-            Terminate = 0x00000001,
-            CreateThread = 0x00000002,
-            VirtualMemoryOperation = 0x00000008,
-            VirtualMemoryRead = 0x00000010,
-            VirtualMemoryWrite = 0x00000020,
-            DuplicateHandle = 0x00000040,
-            CreateProcess = 0x000000080,
-            SetQuota = 0x00000100,
-            SetInformation = 0x00000200,
-            QueryInformation = 0x00000400,
-            QueryLimitedInformation = 0x00001000,
-            Synchronize = 0x00100000
-        }
-
+       
         private Dictionary<IntPtr, Process> Ra3ProcessHandle { get; set; } = new Dictionary<IntPtr, Process>();
         private IntPtr Handle { get; set; } = IntPtr.Zero;
 
-        public bool UnlockProcess(Process ra3Process, ProcessAccessFlags flags)
+        public bool UnlockProcess(Process ra3Process, Pinvokes.ProcessAccessFlags flags)
         {
             LockProcess();
 
             Logger.Debug($"attempt to unlock process (open process). using pid {ra3Process.Id}");
-            Handle = OpenProcess(
+            Handle = Pinvokes.OpenProcess(
                 flags
                 , false
                 , ra3Process.Id
@@ -88,7 +53,7 @@ namespace RatherWeird.Utility
                 Ra3ProcessHandle[Handle].HasExited == false)
             {
                 Logger.Debug("attempt to lock process (close handle)");
-                if (CloseHandle(Handle))
+                if (Pinvokes.CloseHandle(Handle))
                 {
                     Ra3ProcessHandle.Remove(Handle);
                     Handle = IntPtr.Zero;
@@ -116,7 +81,7 @@ namespace RatherWeird.Utility
 
             byte[] bytesToWrite = {value};
 
-            bool success = WriteProcessMemory(Handle, address, bytesToWrite, 1, out _);
+            bool success = Pinvokes.WriteProcessMemory(Handle, address, bytesToWrite, 1, out _);
             if (success)
             {
                 Logger.Debug("OK.. write byte");
