@@ -20,7 +20,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Threading;
 using WindowHook;
-using DirtyInvocation;
 using Microsoft.Win32;
 using RatherWeird.Utility;
 using CheckBox = System.Windows.Controls.CheckBox;
@@ -106,7 +105,7 @@ namespace RatherWeird
             {
                 Task.Delay(100).ContinueWith(_ =>
                 {
-                    Messaging.SimulateAltKeyPress(e.Process.MainWindowHandle);
+                    Inputs.SimulateAltKeyPress(e.Process.MainWindowHandle);
                     // Messaging.InvokeSysKeyPress(e.Process.MainWindowHandle, (uint) Keys.Menu);
                     // Messaging.InvokeSysKeyPress(e.Process.MainWindowHandle, (int)Keys.Menu); // ALT key
                     Logger.Info("OK.. invoke alt keypress after ra3 has gained focus");
@@ -228,6 +227,10 @@ namespace RatherWeird
                         keyNeedsUp = false;
                     }
                 }
+                Inputs.SendMessage(LatestRa3.MainWindowHandle, (int)WM.KeyDown, 0x25, 0x14b0001);
+                Inputs.SendMessage(LatestRa3.MainWindowHandle, (int)WM.KeyUp, 0x25, 0xc14b0001);
+                //Messaging.InvokeKeyPress(LatestRa3.MainWindowHandle, (uint) Keys.Left);
+                Console.WriteLine("Invoked keypress");
             }
 
             // Left
@@ -425,9 +428,9 @@ namespace RatherWeird
             // https://msdn.microsoft.com/en-us/library/windows/desktop/ms646280(v=vs.85).aspx
             // lParam needs to have it's OEM value set (probnably 00011100, I didn't change it) and extended type to 0.
             // I copied the the repeat of 1.
-            Messaging.SendMessage(handle, (int)Messaging.WM.KeyDown, (uint)Keys.Enter, 0x1C0001);
-            Messaging.SendMessage(handle, (int)Messaging.WM.Char, (uint)Keys.Enter, 0x1C0001);
-            Messaging.SendMessage(handle, (int)Messaging.WM.KeyUp, (uint)Keys.Enter, 0xC01C0001);
+            Inputs.SendMessage(handle, (int)Inputs.WM.KeyDown, (uint)Keys.Enter, 0x1C0001);
+            Inputs.SendMessage(handle, (int)Inputs.WM.Char, (uint)Keys.Enter, 0x1C0001);
+            Inputs.SendMessage(handle, (int)Inputs.WM.KeyUp, (uint)Keys.Enter, 0xC01C0001);
         }
 
         private void chHookNumpadEnter_Click(object sender, RoutedEventArgs e)

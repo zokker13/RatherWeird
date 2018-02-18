@@ -69,9 +69,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Inputs.cs" />
     <Compile Include="OnlinePlayers.xaml.cs">
       <DependentUpon>OnlinePlayers.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pinvokes.cs" />
     <Compile Include="Ra3Playerlist.xaml.cs">
       <DependentUpon>Ra3Playerlist.xaml</DependentUpon>
     </Compile>
@@ -79,6 +81,7 @@
     <Compile Include="Utility\MemoryManipulator.cs" />
     <Compile Include="Utility\Networking.cs" />
     <Compile Include="Utility\Utility.cs" />
+    <Compile Include="WindowInvocation.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -130,10 +133,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DirtyInvocation\DirtyInvocation.csproj">
-      <Project>{b4a8b8c7-01ef-4a17-a4fe-d9abe2974af1}</Project>
-      <Name>DirtyInvocation</Name>
-    </ProjectReference>
     <ProjectReference Include="..\WindowHook\WindowHook.csproj">
       <Project>{0291ee27-f4ef-4a39-bd4c-beeb22e6d41d}</Project>
       <Name>WindowHook</Name>

@@ -8,76 +8,43 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace DirtyInvocation
+namespace RatherWeird
 {
 
     public static class WindowInvocation
     {
-        #region PInvokes 
-
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern bool GetWindowRect(IntPtr hwnd, out RECT lpRect);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern bool ClipCursor(ref RECT lpRect);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern bool GetClipCursor(out RECT lpRect);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern long GetWindowLong(IntPtr hWnd, int nIndex);
-
-        [DllImport("user32.dll", EntryPoint = "SetWindowLong", SetLastError = true)]
-        private static extern int SetWindowLong32(IntPtr hWnd, int nIndex, int dwNewLong);
-
-        [DllImport("user32.dll", EntryPoint = "SetWindowLongPtr", SetLastError = true)]
-        private static extern IntPtr SetWindowLongPtr64(IntPtr hWnd, int nIndex, long dwNewLong);
-
-        [DllImport("user32.dll", EntryPoint = "SetWindowPos", SetLastError = true)]
-        public static extern IntPtr SetWindowPos(IntPtr hWnd, int hWndInsertAfter, int x, int y, int cx, int cy,
-            uint wFlags);
-
-        [DllImport("user32.dll")]
-        private static extern bool GetClientRect(IntPtr hWnd, out RECT lpRect);
-        [DllImport("user32.dll")]
-        private static extern IntPtr GetForegroundWindow();
-        [DllImport("user32.dll", SetLastError = true)]
-        static extern uint GetWindowThreadProcessId(IntPtr hWnd, out int lpdwProcessId);
-
-        #endregion
-
         // This static method is required because legacy OSes do not support
         // SetWindowLongPtr
         public static IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, long dwNewLong)
         {
             if (IntPtr.Size == 8)
-                return SetWindowLongPtr64(hWnd, nIndex, dwNewLong);
+                return Pinvokes.SetWindowLongPtr64(hWnd, nIndex, dwNewLong);
             
-            return new IntPtr(SetWindowLong32(hWnd, nIndex, (int)dwNewLong));
+            return new IntPtr(Pinvokes.SetWindowLong32(hWnd, nIndex, (int)dwNewLong));
         }
 
 
         public static bool LockToProcess(Process process)
         {
-            RECT windowRect, clientRect;
-            GetWindowRect(process.MainWindowHandle, out windowRect);
-            GetClientRect(process.MainWindowHandle, out clientRect);
+            Pinvokes.RECT windowRect, clientRect;
+            Pinvokes.GetWindowRect(process.MainWindowHandle, out windowRect);
+            Pinvokes.GetClientRect(process.MainWindowHandle, out clientRect);
 
             int borderThickness = ((windowRect.Right - windowRect.Left) - clientRect.Right) / 2;
             int topBorderThickness = (windowRect.Bottom - windowRect.Top) - clientRect.Bottom;
 
-            RECT lockPosition;
+            Pinvokes.RECT lockPosition;
             lockPosition.Left = windowRect.Left + borderThickness;
             lockPosition.Right = clientRect.Right + windowRect.Left + borderThickness;
             lockPosition.Top = windowRect.Top + topBorderThickness - borderThickness; 
             lockPosition.Bottom = clientRect.Bottom + windowRect.Top + topBorderThickness - borderThickness;
 
-            return ClipCursor(ref lockPosition);
+            return Pinvokes.ClipCursor(ref lockPosition);
         }
         
         public static void DropBorder(Process process)
         {
-            long style = GetWindowLong(process.MainWindowHandle, (int)GwlIndex.GWL_STYLE);
+            long style = Pinvokes.GetWindowLong(process.MainWindowHandle, (int)GwlIndex.GWL_STYLE);
 
             style &= ~((long) WindowStyles.WS_CAPTION | (long) WindowStyles.WS_MAXIMIZE | (long) WindowStyles.WS_MINIMIZE |
                        (long) WindowStyles.WS_SYSMENU);
@@ -101,14 +68,14 @@ namespace DirtyInvocation
         {
             // TODO: Drop this reference to winforms and PInvoke it?
             Screen currentOccupiedScreen = Screen.FromHandle(process.MainWindowHandle);
-            RECT procRect;
-            GetWindowRect(process.MainWindowHandle, out procRect);
+            Pinvokes.RECT procRect;
+            Pinvokes.GetWindowRect(process.MainWindowHandle, out procRect);
 
             // TODO: Repair this: It seems to have a bit too much size like 1926x1102 which makes everything broken.
             int width = procRect.Right - procRect.Left;
             int height = procRect.Bottom - procRect.Top;
 
-            SetWindowPos(
+            Pinvokes.SetWindowPos(
                 process.MainWindowHandle
                 , 0
                 , currentOccupiedScreen.Bounds.X
@@ -121,9 +88,9 @@ namespace DirtyInvocation
 
         public static Process GetForegroundProcess()
         {
-            IntPtr handle = GetForegroundWindow();
+            IntPtr handle = Pinvokes.GetForegroundWindow();
 
-            GetWindowThreadProcessId(handle, out var procId);
+            Pinvokes.GetWindowThreadProcessId(handle, out var procId);
 
             if (procId == -1)
                 return null;
@@ -223,55 +190,5 @@ namespace DirtyInvocation
         WS_EX_RIGHTSCROLLBAR = 0x00000000L,
         WS_EX_TOPMOST = 0x00000008L,
     };
-
-    public struct RECT
-    {
-        #region Variables.
-        /// <summary>
-        /// Left position of the rectangle.
-        /// </summary>
-        public int Left;
-        /// <summary>
-        /// Top position of the rectangle.
-        /// </summary>
-        public int Top;
-        /// <summary>
-        /// Right position of the rectangle.
-        /// </summary>
-        public int Right;
-        /// <summary>
-        /// Bottom position of the rectangle.
-        /// </summary>
-        public int Bottom;
-        
-        #endregion
-
-        #region Constructor.
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="left">Horizontal position.</param>
-        /// <param name="top">Vertical position.</param>
-        /// <param name="right">Right most side.</param>
-        /// <param name="bottom">Bottom most side.</param>
-        public RECT(int left, int top, int right, int bottom)
-        {
-            Left = left;
-            Top = top;
-            Right = right;
-            Bottom = bottom;
-        }
-
-        public override string ToString()
-        {
-            return $"Left: {Left}\n" +
-                   $"Right: {Right}\n" +
-                   $"Top: {Top}\n" +
-                   $"Bottom: {Bottom}\n";
-
-        }
-
-        #endregion
-    }
 
 }
