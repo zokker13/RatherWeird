@@ -16,3 +16,6 @@
 ## Screenshots
 ### Main Application
 ![main_app](docs/main_app.png)
+
+### Player List
+![player_list](docs/player_list.png)
