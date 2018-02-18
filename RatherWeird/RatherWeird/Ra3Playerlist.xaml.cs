@@ -58,7 +58,11 @@ namespace RatherWeird
                 {
                     Logger.Debug("Attempting to download and insert player statistics");
                     CncGeneralInfo info = await GatherData();
-                    InsertData(info);
+                    if (info != null)
+                    {
+                        InsertData(info);
+                    }
+                    
                     Thread.Sleep(1000 * 60);
                 }
             }, _tokenSource.Token);
@@ -73,8 +77,6 @@ namespace RatherWeird
 
         private async Task<CncGeneralInfo> GatherData()
         {
-            CncGeneralInfo info = new CncGeneralInfo();
-
             try
             {
                 WebRequest req = WebRequest.CreateHttp(Constants.CncOnlinePlayerInfo);
@@ -85,8 +87,10 @@ namespace RatherWeird
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
                     Logger.Error($"ER.. Could not get a proper status. Statuscode was ${response.StatusCode}");
-                    return info;
+                    return null;
                 }
+
+                CncGeneralInfo info = new CncGeneralInfo();
 
                 using (Stream streamResponse = response.GetResponseStream())
                 using (StreamReader sr =
@@ -95,6 +99,8 @@ namespace RatherWeird
                     string body = await sr.ReadToEndAsync();
                     info = JsonConvert.DeserializeObject<CncGeneralInfo>(body);
                 }
+
+                return info;
             }
             catch (SecurityException err)
             {
@@ -113,8 +119,7 @@ namespace RatherWeird
                 Logger.Fatal($"ER.. Seems like something unexpected happened. err: {err.Message}");
             }
 
-            return info;
-
+            return null;
         }
 
         private int _oldPlayerCount;
