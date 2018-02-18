@@ -8,7 +8,13 @@
         Title="RatherWeird" Height="283.521" Width="534" Loaded="Window_Loaded" Closed="Window_Closed" ResizeMode="CanMinimize" Icon="dunno_man.ico" Closing="Window_Closing">
     <DockPanel LastChildFill="True">
         <StatusBar Name="statusbar" DockPanel.Dock="Bottom">
-            <Button Name="btnShowPlayers" Content="Show Players" Margin="10, 2, 0,2" Padding="5" Click="btnShowPlayers_Click"></Button>
+            <Button Name="btnShowPlayers" Content="Show Players" Margin="10, 2, 0,2" Padding="5" Click="btnShowPlayers_Click">
+                <Button.ToolTip>
+                    <StackPanel>
+                        <TextBlock>Show the active players.</TextBlock>
+                    </StackPanel>
+                </Button.ToolTip>
+            </Button>
         </StatusBar>
 
         <Grid Margin="0,0,4,0">
