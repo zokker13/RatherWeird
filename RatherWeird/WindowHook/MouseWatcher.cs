@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 // Sources:
 // Deserializing of KBDLLHOOKSTRUCT: https://www.codeproject.com/articles/14485/low-level-windows-api-hooks-from-c-to-stop-unwante
@@ -59,10 +60,15 @@ namespace WindowHook
         }
     }
     public delegate void MouseInputChangeHandler(object sender, MouseInputArgs e);
+    public delegate void CursorPositionChangeHandler(object sender, MouseInputArgs e);
 
     public class MouseWatcher
     {
         #region DLLImport 
+
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool GetCursorPos(out POINT lpPoint);
 
         [DllImport("user32.dll", SetLastError = true)]
         static extern IntPtr CallNextHookEx(
@@ -91,10 +97,13 @@ namespace WindowHook
 
         #endregion
 
+
         public event MouseInputChangeHandler MouseInputChanged;
+        public event CursorPositionChangeHandler CursorPositionChanged;
 
         public bool HookRegistered { get; private set; }
-        
+        public bool IsCursorWatched { get; private set; }
+
         private MouseLLHookHandler _del;
 
         [StructLayout(LayoutKind.Sequential)]
@@ -118,6 +127,40 @@ namespace WindowHook
         private void OnMouseInputChanged(object o, MouseInputArgs e)
         {
             MouseInputChanged?.Invoke(o, e);
+        }
+
+        private void OnCursorPositionChanged(object o, MouseInputArgs e)
+        {
+            CursorPositionChanged?.Invoke(o, e);
+        }
+
+        public bool WatchCursor()
+        {
+            if (IsCursorWatched)
+                return true;
+
+            IsCursorWatched = true;
+            new Thread(() =>
+            {
+                while (IsCursorWatched)
+                {
+                    Thread.Sleep(33);
+
+                    POINT p;
+                    GetCursorPos(out p);
+
+                    OnCursorPositionChanged(this, new MouseInputArgs(0, p, 0));
+                }
+
+            }).Start();
+
+            return true;
+        }
+
+        public bool UnwatchCursor()
+        {
+            IsCursorWatched = false;
+            return true;
         }
 
         public bool HookMouse()

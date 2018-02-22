@@ -100,8 +100,8 @@ namespace RatherWeird
 
         public static Size GetClientSize(Process proc)
         {
-            RECT rect;
-            GetWindowRect(proc.MainWindowHandle, out rect);
+            Pinvokes.RECT rect;
+            Pinvokes.GetWindowRect(proc.MainWindowHandle, out rect);
             
             Size size = new Size(rect);
 
@@ -118,7 +118,7 @@ namespace RatherWeird
         public int Height { get; set; }
         public int Width { get; set; }
 
-        public Size(RECT rect) : this(rect.Left, rect.Right, rect.Top, rect.Bottom)
+        public Size(Pinvokes.RECT rect) : this(rect.Left, rect.Right, rect.Top, rect.Bottom)
         {
             
         }

@@ -91,7 +91,7 @@ namespace RatherWeird
             if (settings.RemoveBorder)
             {
                 WindowInvocation.DropBorder(e.Process);
-                //WindowInvocation.ResizeWindow(e.Process);
+                WindowInvocation.ResizeWindow(e.Process);
                 Logger.Info("OK.. drop border and resize");
             }
 
@@ -137,16 +137,14 @@ namespace RatherWeird
 
             _systemWatcher.Hook();
             _keyboardWatcher.HookKeyboard();
+            _mouseWatcher.WatchCursor();
 
-#if DEBUG
-            _mouseWatcher.HookMouse();
-#endif
 
             _systemWatcher.ForegroundChanged += SystemWatcherSystemChanged;
             _systemWatcher.ShowWindow += SystemWatcherOnShowWindow;
             _systemWatcher.HideWindow += SystemWatcherOnHideWindow;
             _keyboardWatcher.KeyboardInputChanged += _keyboardWatcher_KeyboardInputChanged;
-            _mouseWatcher.MouseInputChanged += MouseWatcherOnMouseInputChanged;
+            _mouseWatcher.CursorPositionChanged += MouseWatcherOnCursorPositionChanged;
 
             var ra3Procs = Process.GetProcessesByName(Constants.Ra3ProcessName);
             if (ra3Procs.Length > 0)
@@ -163,6 +161,15 @@ namespace RatherWeird
             // tmr.Start();
         }
 
+        private void MouseWatcherOnCursorPositionChanged(object sender, MouseInputArgs mouseInputArgs)
+        {
+            if (LatestRa3 == null)
+                return;
+
+            // Still need performance improvements since it's really bad right now :(
+            SimulateBorderScrolling(mouseInputArgs.Point);
+        }
+
         private void RemoveLog()
         {
             try
@@ -177,15 +184,6 @@ namespace RatherWeird
             }
         }
 
-        private void MouseWatcherOnMouseInputChanged(object sender, MouseInputArgs mouseInputArgs)
-        {
-            if (LatestRa3 == null)
-                return;
-            
-            // Still need performance improvements since it's really bad right now :(
-            SimulateBorderScrolling(mouseInputArgs.Point);
-        }
-
         // Im fucking ashamed :(
         private bool needsKeyUp1 = false;
         private bool needsKeyUp2 = false;
@@ -196,14 +194,14 @@ namespace RatherWeird
         {
             POINT point = origin;
             ScreenToClient(LatestRa3.MainWindowHandle, ref point);
-            DirtyInvocation.Size size = WindowInvocation.GetClientSize(LatestRa3);
+            Size size = WindowInvocation.GetClientSize(LatestRa3);
             
 
             if (!size.IsPointInArea(origin.X, origin.Y))
                 return;
             
-            var k = Keyboard.GetKeyStates(Key.Left);
-            Title = k.ToString();
+            // var k = Keyboard.GetKeyStates(Key.Left);
+            // Title = k.ToString();
 
             // I wanted to make it cool but it somewhat looks not so cool. :(
             void Check(bool condition, Keys key, ref bool keyNeedsUp)
@@ -216,21 +214,22 @@ namespace RatherWeird
 
                 if (condition)
                 {
-                    Messaging.PostMessage(LatestRa3.MainWindowHandle, (int) WM.KeyDown, 0, extendedMessage);
+                    Pinvokes.PostMessage(LatestRa3.MainWindowHandle, (int) WM.KeyDown, 0, extendedMessage);
                     keyNeedsUp = true;
                 }
                 else
                 {
                     if (keyNeedsUp)
                     {
-                        Messaging.PostMessage(LatestRa3.MainWindowHandle, (int) WM.KeyUp, 0, extendedMessage);
+                        Pinvokes.PostMessage(LatestRa3.MainWindowHandle, (int) WM.KeyUp, 0, extendedMessage);
                         keyNeedsUp = false;
                     }
                 }
+                /*
                 Inputs.SendMessage(LatestRa3.MainWindowHandle, (int)WM.KeyDown, 0x25, 0x14b0001);
                 Inputs.SendMessage(LatestRa3.MainWindowHandle, (int)WM.KeyUp, 0x25, 0xc14b0001);
                 //Messaging.InvokeKeyPress(LatestRa3.MainWindowHandle, (uint) Keys.Left);
-                Console.WriteLine("Invoked keypress");
+                Console.WriteLine("Invoked keypress");*/
             }
 
             // Left
@@ -319,7 +318,7 @@ namespace RatherWeird
         {
             _systemWatcher.Unhook();
             _keyboardWatcher.UnhookKeyboard();
-            _mouseWatcher.UnhookMouse();
+            _mouseWatcher.UnwatchCursor();
             _memoryManipulator.LockProcess();
 
             Preferences.Write(settings);
