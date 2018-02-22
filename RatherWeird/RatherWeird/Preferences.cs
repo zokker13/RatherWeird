@@ -59,6 +59,7 @@ namespace RatherWeird
         public bool HookNumpadEnter;
         public bool SwapHealthbarLogic;
         public bool DisableWinKey;
+        public int SleepTime;
 
         public SettingEntries()
         {
@@ -70,6 +71,7 @@ namespace RatherWeird
             HookNumpadEnter = true;
             SwapHealthbarLogic = false;
             DisableWinKey = false;
+            SleepTime = 33;
         }
     }
 

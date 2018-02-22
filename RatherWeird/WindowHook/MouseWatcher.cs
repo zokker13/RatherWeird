@@ -134,20 +134,22 @@ namespace WindowHook
             CursorPositionChanged?.Invoke(o, e);
         }
 
-        public bool WatchCursor()
+        public bool WatchCursor(int sleepTime = 33)
         {
             if (IsCursorWatched)
                 return true;
 
             IsCursorWatched = true;
+            
             new Thread(() =>
             {
                 while (IsCursorWatched)
                 {
-                    Thread.Sleep(33);
+                    Thread.Sleep(sleepTime);
 
                     POINT p;
                     GetCursorPos(out p);
+                    
 
                     OnCursorPositionChanged(this, new MouseInputArgs(0, p, 0));
                 }

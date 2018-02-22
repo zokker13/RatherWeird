@@ -87,6 +87,9 @@ namespace RatherWeird
                 return;
 
             LatestRa3 = e.Process;
+
+            if (settings.LaunchRa3Windowed)
+                _mouseWatcher.WatchCursor(settings.SleepTime);
             
             if (settings.RemoveBorder)
             {
@@ -137,8 +140,6 @@ namespace RatherWeird
 
             _systemWatcher.Hook();
             _keyboardWatcher.HookKeyboard();
-            _mouseWatcher.WatchCursor();
-
 
             _systemWatcher.ForegroundChanged += SystemWatcherSystemChanged;
             _systemWatcher.ShowWindow += SystemWatcherOnShowWindow;
@@ -199,9 +200,6 @@ namespace RatherWeird
 
             if (!size.IsPointInArea(origin.X, origin.Y))
                 return;
-            
-            // var k = Keyboard.GetKeyStates(Key.Left);
-            // Title = k.ToString();
 
             // I wanted to make it cool but it somewhat looks not so cool. :(
             void Check(bool condition, Keys key, ref bool keyNeedsUp)
