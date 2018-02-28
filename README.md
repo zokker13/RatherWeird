@@ -10,6 +10,9 @@
 * Swap Healthbar logic (Healthbars can be shown automatically on start)
 * Disable Windows Keys 
 
+## Requirements
+* [.Net Framework 4.7.1](https://www.microsoft.com/en-us/download/details.aspx?id=56115&desc=dotnet47)
+
 ## Todo
 * (Re-) Add borders around window to move it around
 
