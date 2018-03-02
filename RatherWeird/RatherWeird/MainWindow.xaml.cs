@@ -447,12 +447,10 @@ namespace RatherWeird
         private void SwapHealthbarLogic()
         {
             if (LatestRa3 == null)
-            {
                 return;
-            }
             
             byte byteToWrite = settings.SwapHealthbarLogic ? (byte)116 : (byte)117;
-            bool success = _memoryManipulator.WriteByte((IntPtr)0x0052EB93, byteToWrite);
+            bool success = _memoryManipulator.WriteByte((IntPtr)(0x12EB93 + (int)LatestRa3.MainModule.BaseAddress), byteToWrite);
 
             Logger.Info($"swap healthbar logic successful: {success}");
         }
