@@ -71,7 +71,7 @@ namespace RatherWeird
             HookNumpadEnter = true;
             SwapHealthbarLogic = false;
             DisableWinKey = false;
-            SleepTime = 33;
+            SleepTime = 16;
         }
     }
 
