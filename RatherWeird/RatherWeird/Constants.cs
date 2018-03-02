@@ -24,6 +24,7 @@ namespace RatherWeird
         public static readonly uint Ra3CharBufferSize = 269;
 
         #endregion
+
         public static readonly int Ra3InnerScrollBorderSize = 2;
     }
 }
