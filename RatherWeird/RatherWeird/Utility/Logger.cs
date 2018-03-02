@@ -23,10 +23,11 @@ namespace RatherWeird.Utility
         public static void Log(LogType type, string text)
         {
             DateTime now = DateTime.Now;
-            
+
+            string msg = $"[{now.ToString(CultureInfo.InvariantCulture)} ({type})] {text}";
             using (StreamWriter sw = File.AppendText(Constants.Logfile))
             {
-                sw.WriteLine($"[{now.ToString(CultureInfo.InvariantCulture)} ({type})] {text}");
+                sw.WriteLine(msg);
             }
         }
 

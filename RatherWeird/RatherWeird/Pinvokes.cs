@@ -9,6 +9,8 @@ namespace RatherWeird
 {
     public static class Pinvokes
     {
+        #region kernel32
+
         // Stolen from pinvoke: http://www.pinvoke.net/default.aspx/kernel32/OpenProcess.html
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern IntPtr OpenProcess(ProcessAccessFlags processAccess, bool bInheritHandle, int processId);
@@ -25,10 +27,32 @@ namespace RatherWeird
             uint nSize,
             out uint lpNumberOfBytesWritten);
 
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern IntPtr GetConsoleWindow();
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool AllocConsole();
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern int GetConsoleOutputCP();
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool FreeConsole();
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern IntPtr GetStdHandle(int nStdHandle);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern void SetStdHandle(UInt32 nStdHandle, IntPtr handle);
+
+        #endregion
+
+        #region user32.dll
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern IntPtr SendMessage(IntPtr hWnd, int msg, uint wParam, long lParam);
-        
+
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         public static extern bool PostMessage(IntPtr hWnd, uint msg, uint wParam, long lParam);
         [DllImport("user32.dll", SetLastError = true)]
@@ -59,6 +83,9 @@ namespace RatherWeird
         public static extern IntPtr GetForegroundWindow();
         [DllImport("user32.dll", SetLastError = true)]
         public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out int lpdwProcessId);
+
+        #endregion
+
 
         public struct RECT
         {

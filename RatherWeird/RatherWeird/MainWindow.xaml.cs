@@ -21,6 +21,7 @@ using System.Windows.Navigation;
 using System.Windows.Threading;
 using WindowHook;
 using Microsoft.Win32;
+using Microsoft.Win32.SafeHandles;
 using RatherWeird.Utility;
 using CheckBox = System.Windows.Controls.CheckBox;
 using FileDialog = Microsoft.Win32.FileDialog;
