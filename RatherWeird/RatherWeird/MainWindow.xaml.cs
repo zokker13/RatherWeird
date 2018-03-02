@@ -164,6 +164,11 @@ namespace RatherWeird
             SetupControls();
 
             _systemWatcher.ForegroundChanged += SystemWatcherSystemChanged;
+
+            _memoryManipulator.MemoryWatchChanged += MemoryManipulatorOnMemoryWatchChanged;
+            _memoryManipulator.ProcessUnlocked += MemoryManipulatorOnProcessUnlocked;
+            _memoryManipulator.ProcessLocked += MemoryManipulatorOnProcessLocked;
+
             _keyboardWatcher.KeyboardInputChanged += _keyboardWatcher_KeyboardInputChanged;
             _mouseWatcher.CursorPositionChanged += MouseWatcherOnCursorPositionChanged;
             _processWatcher.ProcessStarted += ProcessWatcherOnProcessStarted;
@@ -218,6 +223,22 @@ namespace RatherWeird
         }
 
 
+
+        private void MemoryManipulatorOnProcessLocked(object sender, ProcessHandleArgs processHandleArgs)
+        {
+            Logger.Info($"{processHandleArgs.Process.ProcessName} Locked!");
+        }
+
+        private void MemoryManipulatorOnProcessUnlocked(object sender, ProcessHandleArgs processHandleArgs)
+        {
+            Logger.Info($"{processHandleArgs.Process.ProcessName} Unlocked!");
+            _memoryManipulator.WatchAddress((IntPtr)0x00CF5A00, 269);
+        }
+
+        private void MemoryManipulatorOnMemoryWatchChanged(object sender, MemoryWatchArgs memoryWatchArgs)
+        {
+            Logger.Debug($"{memoryWatchArgs.Address.ToString("X8")} -> {Encoding.UTF8.GetString(memoryWatchArgs.Buffer)}");
+        }
 
         private void MouseWatcherOnCursorPositionChanged(object sender, MouseInputArgs mouseInputArgs)
         {

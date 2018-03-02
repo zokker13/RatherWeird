@@ -15,6 +15,7 @@ namespace RatherWeird
         public static readonly string Logfile = "ratherweird_log.txt";
         public static readonly string ApplicationVersion = "0.7.0-pre.1";
         public static readonly string CncOnlinePlayerInfo = "https://info.server.cnc-online.net/";
+        public static readonly int MemoryWatcherSleep = 100;
 
         #endregion
 
