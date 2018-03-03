@@ -30,7 +30,7 @@ namespace RatherWeird
             return true;
         }
 
-        public static uint WriteProcessMemory(IntPtr handle, IntPtr address, byte[] buffer, uint size)
+        public static uint WriteProcessMemory(IntPtr handle, IntPtr address, byte[] buffer, int size)
         {
             bool result = Pinvokes.WriteProcessMemory(handle, address, buffer, size, out var numberOfBytesWritten);
 

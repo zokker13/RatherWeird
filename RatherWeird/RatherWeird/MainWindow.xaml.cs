@@ -46,14 +46,17 @@ namespace RatherWeird
         const uint MAPVK_VSC_TO_VK_EX = 0x03;
         const uint MAPVK_VK_TO_VSC_EX = 0x04;
 
+        private readonly ProcessWatcher _processWatcher = new ProcessWatcher();
         private readonly SystemWatcher _systemWatcher = new SystemWatcher();
         private readonly KeyboardWatcher _keyboardWatcher = new KeyboardWatcher();
         private readonly MouseWatcher _mouseWatcher = new MouseWatcher();
         private readonly MemoryManipulator _memoryManipulator = new MemoryManipulator();
+        private readonly MemHax _memHax = new MemHax();
 
         private readonly OnlinePlayers _onlinePlayers = new OnlinePlayers();
         
         private Process _latestRa3 = null;
+        DispatcherTimer tmr = new DispatcherTimer();
 
         private Process LatestRa3
         {
@@ -62,13 +65,17 @@ namespace RatherWeird
             {
                 if (value.Id != _latestRa3?.Id)
                 {
+                    Console.WriteLine($"Changed - IDs different?! {_latestRa3?.Id} -> {value.Id}");
+                    Console.WriteLine(value.ProcessName);
                     _latestRa3 = value;
-
+                    /*
+                    
                     _memoryManipulator.LockProcess();
 
                     _memoryManipulator.UnlockProcess(LatestRa3,
                         Pinvokes.ProcessAccessFlags.VirtualMemoryWrite |
                         Pinvokes.ProcessAccessFlags.VirtualMemoryOperation);
+                    */
 
                     SwapHealthbarLogic();
                 }
@@ -86,8 +93,9 @@ namespace RatherWeird
         {
             if (e.Process.ProcessName!= Constants.Ra3ProcessName)
                 return;
-
-            LatestRa3 = e.Process;
+            
+            if (LatestRa3 == null || LatestRa3.HasExited)
+                LatestRa3 = e.Process;
 
             if (settings.LaunchRa3Windowed)
                 _mouseWatcher.WatchCursor(settings.SleepTime);
@@ -139,29 +147,57 @@ namespace RatherWeird
 
             SetupControls();
 
-            _systemWatcher.Hook();
-            _keyboardWatcher.HookKeyboard();
-
             _systemWatcher.ForegroundChanged += SystemWatcherSystemChanged;
-            _systemWatcher.ShowWindow += SystemWatcherOnShowWindow;
-            _systemWatcher.HideWindow += SystemWatcherOnHideWindow;
             _keyboardWatcher.KeyboardInputChanged += _keyboardWatcher_KeyboardInputChanged;
             _mouseWatcher.CursorPositionChanged += MouseWatcherOnCursorPositionChanged;
+            _processWatcher.ProcessStarted += ProcessWatcherOnProcessStarted;
+            _processWatcher.ProcessFinished += ProcessWatcherOnProcessFinished;
+
+            _systemWatcher.Hook();
+            _keyboardWatcher.HookKeyboard();
+            _processWatcher.Hook();
 
             var ra3Procs = Process.GetProcessesByName(Constants.Ra3ProcessName);
             if (ra3Procs.Length > 0)
             {
-                LatestRa3 = ra3Procs[0];
+                if (LatestRa3 == null || LatestRa3.HasExited)
+                    LatestRa3 = ra3Procs[0];
             }
-
-
-            DispatcherTimer tmr = new DispatcherTimer();
+            
             tmr.Tick += Tmr_Tick;
             tmr.Interval = new TimeSpan(0, 0, 0, 1);
 
             Logger.Info("OK.. application launch");
             // tmr.Start();
         }
+
+        private void ProcessWatcherOnProcessFinished(object sender, ProcessArgs e)
+        {
+            Console.WriteLine($"[{e.Process.ProcessName}] FINISHED");
+        }
+
+        private void ProcessWatcherOnProcessStarted(object sender, ProcessArgs e)
+        {
+            Console.WriteLine($"[{e.Process.ProcessName}] LAUNCHED");
+
+            if (e.Process.ProcessName != Constants.Ra3ProcessName)
+                return;
+
+            Logger.Debug($"Found ra3 process - Has Window: {Pinvokes.IsWindow(e.Process.MainWindowHandle)}");
+
+            // Right after process creation, ra3 doesnt have a window and it can be assumed that the process is not fully loaded.
+            // This is a workaround which will probably remain here forever :/
+            if (!Pinvokes.IsWindow(e.Process.MainWindowHandle))
+            {
+                Task.Delay(1000).ContinueWith(_ => { ProcessWatcherOnProcessStarted(sender, e); });
+                return;
+            }
+            
+            if (LatestRa3 == null || LatestRa3.HasExited)
+                LatestRa3 = e.Process;
+        }
+
+
 
         private void MouseWatcherOnCursorPositionChanged(object sender, MouseInputArgs mouseInputArgs)
         {
@@ -245,19 +281,6 @@ namespace RatherWeird
 
         }
 
-        private void SystemWatcherOnHideWindow(object sender, ProcessArgs e)
-        {
-            // :( ??
-        }
-
-        private void SystemWatcherOnShowWindow(object sender, ProcessArgs e)
-        {
-            if (e.Process.ProcessName != Constants.Ra3ProcessName)
-                return;
-
-            LatestRa3 = e.Process;
-        }
-
         private void _keyboardWatcher_KeyboardInputChanged(object sender, KeyboardInputArgs e)
         {
             HookNumpadEnter(e);
@@ -300,7 +323,7 @@ namespace RatherWeird
         }
 
         private void Tmr_Tick(object sender, EventArgs e)
-        {
+        {/*
             if (LatestRa3 == null)
                 return;
 
@@ -310,15 +333,18 @@ namespace RatherWeird
             foreach (var mibTcprowOwnerPid in ra3Connections)
             {
                 Console.WriteLine(mibTcprowOwnerPid.RemoteAddress.ToString());
-            }
+            }*/
+
+            _processWatcher.CheckProcesses();
         }
 
         private void Window_Closed(object sender, EventArgs e)
         {
+            _processWatcher.Unhook();
             _systemWatcher.Unhook();
             _keyboardWatcher.UnhookKeyboard();
             _mouseWatcher.UnwatchCursor();
-            _memoryManipulator.LockProcess();
+            //_memoryManipulator.LockProcess();
 
             Preferences.Write(settings);
         }
@@ -449,11 +475,17 @@ namespace RatherWeird
         {
             if (LatestRa3 == null)
                 return;
-            
-            byte byteToWrite = settings.SwapHealthbarLogic ? (byte)116 : (byte)117;
-            bool success = _memoryManipulator.WriteByte((IntPtr)(0x12EB93 + (int)LatestRa3.MainModule.BaseAddress), byteToWrite);
 
+            Console.WriteLine("Swapping called");
+
+            byte byteToWrite = settings.SwapHealthbarLogic ? (byte)116 : (byte)117;
+            //bool success = _memoryManipulator.WriteByte((IntPtr)(0x12EB93 + (int)LatestRa3?.MainModule?.BaseAddress), byteToWrite);
+            bool success = _memHax.WriteBytes(LatestRa3, (IntPtr) (0x12EB93 + (int) LatestRa3?.MainModule?.BaseAddress),
+                new[] {byteToWrite});
+            
             Logger.Info($"swap healthbar logic successful: {success}");
+            tmr.Stop();
+            
         }
 
         private void SwapWinKeyState(bool disableKey)

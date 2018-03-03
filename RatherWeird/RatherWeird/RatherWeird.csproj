@@ -79,6 +79,7 @@
       <DependentUpon>Ra3Playerlist.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utility\Logger.cs" />
+    <Compile Include="Utility\MemHax.cs" />
     <Compile Include="Utility\MemoryManipulator.cs" />
     <Compile Include="Utility\Networking.cs" />
     <Compile Include="Utility\Utility.cs" />

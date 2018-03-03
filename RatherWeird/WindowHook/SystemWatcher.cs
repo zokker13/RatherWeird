@@ -99,8 +99,6 @@ namespace WindowHook
         private const uint WINEVENT_OUTOFCONTEXT = 0x0000; // Events are ASYNC
 
         public event ForegroundChangeHandler ForegroundChanged;
-        public event ShowWindowHandler ShowWindow;
-        public event HideWindowHandler HideWindow;
 
         private readonly List<IntPtr> _wndHooks = new List<IntPtr>();
 
@@ -125,45 +123,13 @@ namespace WindowHook
                     case SystemEvents.SystemForeground:
                         OnForegroundChange(this, new ProcessArgs(AquireProcessFromHandle(hwnd)));
                         break;
-                    case SystemEvents.ObjectShow:
-                        OnShowWindow(this, new ProcessArgs(AquireProcessFromHandle(hwnd)));
-                        break;
-                    case SystemEvents.ObjectHide:
-                        OnHideWindow(this, new ProcessArgs(AquireProcessFromHandle(hwnd)));
-                        break;
                 }
             };
-
-            // DEBUG
-            /*
-            _wndHooks.Add(
-                SetWinEventHook(
-                    SystemEvents.EventMin
-                    , SystemEvents.EventMax
-                    , IntPtr.Zero
-                    , _del
-                    , 0
-                    , 0
-                    , WINEVENT_OUTOFCONTEXT
-                )
-            );*/
 
             _wndHooks.Add(
                 SetWinEventHook(
                     SystemEvents.SystemForeground
                     , SystemEvents.SystemForeground
-                    , IntPtr.Zero
-                    , _del
-                    , 0
-                    , 0
-                    , WINEVENT_OUTOFCONTEXT
-                )
-            );
-
-            _wndHooks.Add(
-                SetWinEventHook(
-                    SystemEvents.ObjectShow
-                    , SystemEvents.ObjectHide
                     , IntPtr.Zero
                     , _del
                     , 0
@@ -191,21 +157,9 @@ namespace WindowHook
         {
             ForegroundChanged?.Invoke(o, e);
         }
-
-        private void OnShowWindow(object o, ProcessArgs e)
-        {
-            ShowWindow?.Invoke(o, e);
-        }
-
-        private void OnHideWindow(object o, ProcessArgs e)
-        {
-            HideWindow?.Invoke(o, e);
-        }
     }
 
     public delegate void ForegroundChangeHandler(object sender, ProcessArgs e);
-    public delegate void ShowWindowHandler(object sender, ProcessArgs e);
-    public delegate void HideWindowHandler(object sender, ProcessArgs e);
 
     public class ProcessArgs : EventArgs
     {

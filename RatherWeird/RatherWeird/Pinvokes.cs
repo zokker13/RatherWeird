@@ -24,7 +24,7 @@ namespace RatherWeird
             IntPtr hProcess,
             IntPtr lpBaseAddress,
             byte[] lpBuffer,
-            uint nSize,
+            int nSize,
             out uint lpNumberOfBytesWritten);
 
         [DllImport("kernel32.dll", SetLastError = true)]
@@ -49,6 +49,10 @@ namespace RatherWeird
         #endregion
 
         #region user32.dll
+
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool IsWindow(IntPtr hWnd);
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern IntPtr SendMessage(IntPtr hWnd, int msg, uint wParam, long lParam);

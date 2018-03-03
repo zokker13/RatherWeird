@@ -11,6 +11,12 @@ namespace RatherWeird.Utility
 {
     public class Utility
     {
+
+        public static bool IsProperRa3Process(Process proc)
+        {
+            return proc.ProcessName == Constants.Ra3ProcessName;
+        }
+
         public static Dictionary<string, string> SystemInformation()
         {
             Dictionary<string, string> systemInfo = new Dictionary<string, string>();

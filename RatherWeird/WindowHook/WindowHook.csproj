@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MouseWatcher.cs" />
+    <Compile Include="ProcessWatcher.cs" />
     <Compile Include="SystemWatcher.cs" />
     <Compile Include="KeyboardWatcher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

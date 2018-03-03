@@ -27,7 +27,15 @@ namespace RatherWeird.Utility
             string msg = $"[{now.ToString(CultureInfo.InvariantCulture)} ({type})] {text}";
             using (StreamWriter sw = File.AppendText(Constants.Logfile))
             {
-                sw.WriteLine(msg);
+                try
+                {
+                    sw.WriteLine(msg);
+                }
+                catch (IOException)
+                {
+                    // Might be someone listeneing to the file
+                }
+                
             }
         }
 

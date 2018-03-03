@@ -21,25 +21,29 @@ namespace RatherWeird.Utility
        
         private Dictionary<IntPtr, Process> Ra3ProcessHandle { get; set; } = new Dictionary<IntPtr, Process>();
         private IntPtr Handle { get; set; } = IntPtr.Zero;
+        private bool _processUnlocked = false;
 
         public bool UnlockProcess(Process ra3Process, Pinvokes.ProcessAccessFlags flags)
         {
             LockProcess();
-
+            
             Logger.Debug($"attempt to unlock process (open process). using pid {ra3Process.Id}");
-            Handle = Pinvokes.OpenProcess(
+            IntPtr tmpHandle = Pinvokes.OpenProcess(
                 flags
                 , false
                 , ra3Process.Id
             );
 
-            if (Handle != IntPtr.Zero)
+            if (tmpHandle != IntPtr.Zero)
             {
-                Ra3ProcessHandle.Add(Handle, ra3Process);
+                _processUnlocked = true;
+                Handle = tmpHandle;
+                Ra3ProcessHandle.Add(tmpHandle, ra3Process);
                 Logger.Debug("OK.. unlock process (open process)");
                 return true;
             }
 
+            _processUnlocked = false;
             int errCode = Marshal.GetLastWin32Error();
 
             Logger.Error($"ER.. unlock process (open process). code: {errCode}");
@@ -57,6 +61,7 @@ namespace RatherWeird.Utility
                 {
                     Ra3ProcessHandle.Remove(Handle);
                     Handle = IntPtr.Zero;
+                    _processUnlocked = false;
                     Logger.Debug("OK.. lock process (close handle)");
                 }
                 else
@@ -72,7 +77,7 @@ namespace RatherWeird.Utility
 
         public bool WriteByte(IntPtr address, byte value)
         {
-            if (Handle == IntPtr.Zero)
+            if (Handle == IntPtr.Zero || !_processUnlocked)
             {
                 throw new InvalidHandle();
             }
