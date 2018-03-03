@@ -65,17 +65,9 @@ namespace RatherWeird
             {
                 if (value.Id != _latestRa3?.Id)
                 {
-                    Console.WriteLine($"Changed - IDs different?! {_latestRa3?.Id} -> {value.Id}");
-                    Console.WriteLine(value.ProcessName);
                     _latestRa3 = value;
-                    /*
-                    
-                    _memoryManipulator.LockProcess();
 
-                    _memoryManipulator.UnlockProcess(LatestRa3,
-                        Pinvokes.ProcessAccessFlags.VirtualMemoryWrite |
-                        Pinvokes.ProcessAccessFlags.VirtualMemoryOperation);
-                    */
+                    btnLaunchRa3.Dispatcher.Invoke(() => { btnLaunchRa3.Content = "RA3 launched"; });
 
                     SwapHealthbarLogic();
                 }
@@ -193,6 +185,15 @@ namespace RatherWeird
         private void ProcessWatcherOnProcessFinished(object sender, ProcessArgs e)
         {
             Console.WriteLine($"[{e.Process.ProcessName}] FINISHED");
+
+            if (Utility.Utility.IsProperRa3Process(e.Process))
+            {
+                btnLaunchRa3.Dispatcher.Invoke(() =>
+                {
+                    btnLaunchRa3.Content = "Launch RA3";
+                    btnLaunchRa3.IsEnabled = true;
+                });
+            }
         }
 
         private void ProcessWatcherOnProcessStarted(object sender, ProcessArgs e)
@@ -435,6 +436,7 @@ namespace RatherWeird
         
         private void btnLaunchRa3_Click(object sender, RoutedEventArgs e)
         {
+            var s = sender as System.Windows.Controls.Button;
             Task.Run(() =>
             {
                 string pathToRa3 = GetRa3Executable();
@@ -450,6 +452,11 @@ namespace RatherWeird
                     : "";
 
                 Process.Start(pathToRa3, arguments);
+                s?.Dispatcher.Invoke(() =>
+                {
+                    s.Content = "RA3 is launching...";
+                    s.IsEnabled = false;
+                });
             });
         }
 
@@ -567,6 +574,7 @@ namespace RatherWeird
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             _onlinePlayers.ProperlyClose();
+            _memHax.CleanHandles();
         }
     }
 }
