@@ -137,6 +137,30 @@ namespace RatherWeird
             var adhocSender = sender as CheckBox;
             settings.InvokeAltUp = adhocSender?.IsChecked == true;
         }
+
+        private void FindRa3Process()
+        {
+            var ra3Procs = Process.GetProcessesByName(Constants.Ra3ProcessName);
+
+            if (ra3Procs.Length <= 0)
+            {
+                Logger.Debug("RA3 *not* found at startup.");
+                return;
+            }
+
+            if (Pinvokes.IsWindow(ra3Procs[0].MainWindowHandle))
+            {
+                Logger.Debug("RA3 found at startup.");
+                LatestRa3 = ra3Procs[0];
+                return;
+            }
+
+            Task.Delay(1000).ContinueWith(_ =>
+            {
+                Logger.Debug("RA3 found but no window yet. Retry.");
+                FindRa3Process();
+            });
+        }
         
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -157,12 +181,7 @@ namespace RatherWeird
             _keyboardWatcher.HookKeyboard();
             _processWatcher.Hook();
 
-            var ra3Procs = Process.GetProcessesByName(Constants.Ra3ProcessName);
-            if (ra3Procs.Length > 0)
-            {
-                if (LatestRa3 == null || LatestRa3.HasExited)
-                    LatestRa3 = ra3Procs[0];
-            }
+            FindRa3Process();
             
             tmr.Tick += Tmr_Tick;
             tmr.Interval = new TimeSpan(0, 0, 0, 1);
