@@ -50,7 +50,6 @@ namespace RatherWeird
         private readonly SystemWatcher _systemWatcher = new SystemWatcher();
         private readonly KeyboardWatcher _keyboardWatcher = new KeyboardWatcher();
         private readonly MouseWatcher _mouseWatcher = new MouseWatcher();
-        private readonly MemoryManipulator _memoryManipulator = new MemoryManipulator();
         private readonly MemHax _memHax = new MemHax();
 
         private readonly OnlinePlayers _onlinePlayers = new OnlinePlayers();
@@ -70,6 +69,7 @@ namespace RatherWeird
                     btnLaunchRa3.Dispatcher.Invoke(() => { btnLaunchRa3.Content = "RA3 launched"; });
 
                     SwapHealthbarLogic();
+                    RegisterChatWatcher();
                 }
             }
         }
@@ -165,9 +165,7 @@ namespace RatherWeird
 
             _systemWatcher.ForegroundChanged += SystemWatcherSystemChanged;
 
-            _memoryManipulator.MemoryWatchChanged += MemoryManipulatorOnMemoryWatchChanged;
-            _memoryManipulator.ProcessUnlocked += MemoryManipulatorOnProcessUnlocked;
-            _memoryManipulator.ProcessLocked += MemoryManipulatorOnProcessLocked;
+            _memHax.MemoryWatchChanged += MemoryManipulatorOnMemoryWatchChanged;
 
             _keyboardWatcher.KeyboardInputChanged += _keyboardWatcher_KeyboardInputChanged;
             _mouseWatcher.CursorPositionChanged += MouseWatcherOnCursorPositionChanged;
@@ -221,20 +219,7 @@ namespace RatherWeird
             if (LatestRa3 == null || LatestRa3.HasExited)
                 LatestRa3 = e.Process;
         }
-
-
-
-        private void MemoryManipulatorOnProcessLocked(object sender, ProcessHandleArgs processHandleArgs)
-        {
-            Logger.Info($"{processHandleArgs.Process.ProcessName} Locked!");
-        }
-
-        private void MemoryManipulatorOnProcessUnlocked(object sender, ProcessHandleArgs processHandleArgs)
-        {
-            Logger.Info($"{processHandleArgs.Process.ProcessName} Unlocked!");
-            _memoryManipulator.WatchAddress((IntPtr)0x00CF5A00, 269);
-        }
-
+        
         private void MemoryManipulatorOnMemoryWatchChanged(object sender, MemoryWatchArgs memoryWatchArgs)
         {
             Logger.Debug($"{memoryWatchArgs.Address.ToString("X8")} -> {Encoding.UTF8.GetString(memoryWatchArgs.Buffer)}");
@@ -523,7 +508,7 @@ namespace RatherWeird
             if (LatestRa3 == null)
                 return;
 
-            Console.WriteLine("Swapping called");
+            Logger.Debug("Swapping called");
 
             byte byteToWrite = settings.SwapHealthbarLogic ? (byte)116 : (byte)117;
             //bool success = _memoryManipulator.WriteByte((IntPtr)(0x12EB93 + (int)LatestRa3?.MainModule?.BaseAddress), byteToWrite);
@@ -596,6 +581,14 @@ namespace RatherWeird
         {
             _onlinePlayers.ProperlyClose();
             _memHax.CleanHandles();
+        }
+
+        private void RegisterChatWatcher()
+        {
+            if (LatestRa3 == null)
+                return;
+
+            _memHax.WatchAddress(LatestRa3, (IntPtr)0x00CF5A00, 269, 1000);
         }
     }
 }

@@ -25,17 +25,19 @@ namespace RatherWeird.Utility
             DateTime now = DateTime.Now;
 
             string msg = $"[{now.ToString(CultureInfo.InvariantCulture)} ({type})] {text}";
-            using (StreamWriter sw = File.AppendText(Constants.Logfile))
+            try
             {
-                try
+                using (StreamWriter sw = File.AppendText(Constants.Logfile))
                 {
+
                     sw.WriteLine(msg);
+
+
                 }
-                catch (IOException)
-                {
-                    // Might be someone listeneing to the file
-                }
-                
+            }
+            catch (IOException)
+            {
+                // Might be someone listeneing to the file
             }
         }
 
