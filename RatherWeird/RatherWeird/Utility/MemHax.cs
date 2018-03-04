@@ -21,13 +21,13 @@ namespace RatherWeird.Utility
 
     public class MemHax
     {
-        private readonly Dictionary<Tuple<int, IntPtr>, Thread> _memoryWatching =
-            new Dictionary<Tuple<int, IntPtr>, Thread>();
+        private readonly Dictionary<Tuple<int, IntPtr>, ThreadState> _memoryWatching =
+            new Dictionary<Tuple<int, IntPtr>, ThreadState>();
         private readonly Dictionary<Tuple<int, PFlags>, IntPtr> _procIdHandle =
             new Dictionary<Tuple<int, PFlags>, IntPtr>();
 
         public event MemoryWatchChangeHandler MemoryWatchChanged;
-
+        
         public void CleanHandles()
         {
             foreach (var intPtr in _procIdHandle)
@@ -35,7 +35,7 @@ namespace RatherWeird.Utility
                 Pinvokes.CloseHandle(intPtr.Value);
             }
 
-
+            UnwatchAddresses();
 
             _procIdHandle.Clear();
         }
@@ -47,7 +47,6 @@ namespace RatherWeird.Utility
             if (_procIdHandle.ContainsKey(accessor))
             {
                 var existingHandle = _procIdHandle[accessor];
-                Logger.Info($"Returned existing handle to PID/flags \"{accessor}\": 0x{existingHandle.ToString("X8")}");
                 return existingHandle;
             }
 
@@ -56,7 +55,7 @@ namespace RatherWeird.Utility
             if (handle == IntPtr.Zero)
             {
                 int errCode = Marshal.GetLastWin32Error();
-                Logger.Error($"ER.. unlock process (OpenProcess). code: {errCode}");
+                Logger.Error($"ER.. unlock process (OpenProcess) to PID/flags: {accessor}. code: {errCode}");
             }
 
             Logger.Info($"Returned fresh handle to PID/flags \"{accessor}\": 0x{handle.ToString("X8")}");
@@ -92,12 +91,13 @@ namespace RatherWeird.Utility
                 Logger.Warn("Early exist from WatchAddress - address already watched!");
                 return;
             }
-
+            
+            _memoryWatching.Add(accessor, new ThreadState());
             Thread thrTemp = new Thread(() =>
             {
                 byte[] oldBuffer = new byte[size];
 
-                while (true)
+                while (!proc.HasExited && _memoryWatching[accessor].IsActive)
                 {
                     Thread.Sleep(interval);
 
@@ -108,10 +108,20 @@ namespace RatherWeird.Utility
                         OnWatchChanged(new MemoryWatchArgs(address, size, buffer));
                     }
                 }
+
+                _memoryWatching.Remove(accessor);
             });
 
-            _memoryWatching.Add(accessor, thrTemp);
+            // _memoryWatching.Add(accessor, thrTemp);
             thrTemp.Start();
+        }
+
+        public void UnwatchAddresses()
+        {
+            foreach (var b in _memoryWatching)
+            {
+                _memoryWatching[b.Key].IsActive = false;
+            }
         }
 
 
@@ -175,5 +185,10 @@ namespace RatherWeird.Utility
             Handle = handle;
             Process = process;
         }
+    }
+
+    class ThreadState
+    {
+        public bool IsActive { get; set; } = true;
     }
 }
