@@ -123,6 +123,6 @@
                 </Button>
             </Grid>
         </GroupBox>
-    </Grid>
+        </Grid>
     </DockPanel>
 </Window>

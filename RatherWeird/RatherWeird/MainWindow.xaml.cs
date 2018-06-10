@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -176,9 +177,10 @@ namespace RatherWeird
             FindRa3Process();
             
             tmr.Tick += Tmr_Tick;
-            tmr.Interval = new TimeSpan(0, 0, 0, 1);
+            tmr.Interval = new TimeSpan(0, 0, 0, 10);
 
             Logger.Info("OK.. application launch");
+            
             // tmr.Start();
         }
 
@@ -342,7 +344,7 @@ namespace RatherWeird
             }
         }
 
-        private void Tmr_Tick(object sender, EventArgs e)
+        private async void Tmr_Tick(object sender, EventArgs e)
         {/*
             if (LatestRa3 == null)
                 return;
@@ -355,7 +357,31 @@ namespace RatherWeird
                 Console.WriteLine(mibTcprowOwnerPid.RemoteAddress.ToString());
             }*/
 
-            _processWatcher.CheckProcesses();
+            // _processWatcher.CheckProcesses();
+
+            // Sample Code...
+            string guid = await GuidGenerator.Generate();
+            await PutReport("http://127.0.0.1:1337/report", guid);
+
+        }
+
+        private Task PutReport(string url, string guid)
+        {
+            return Task.Run(() =>
+            {
+                var request = (HttpWebRequest) WebRequest.Create(url);
+                request.Method = "POST";
+                request.ContentType = "application/json";
+                string payload = $"{{\"client_id\": \"{guid}\"}}";
+
+                using (var reqStream = request.GetRequestStream())
+                {
+                    reqStream.Write(Encoding.UTF8.GetBytes(payload), 0, payload.Length);
+                }
+
+                HttpWebResponse res = (HttpWebResponse) request.GetResponse();
+                string statusCode = res.StatusCode.ToString();
+            });
         }
 
         private void Window_Closed(object sender, EventArgs e)
