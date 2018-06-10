@@ -78,6 +78,7 @@
     <Compile Include="Ra3Playerlist.xaml.cs">
       <DependentUpon>Ra3Playerlist.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Utility\GuidGenerator.cs" />
     <Compile Include="Utility\Logger.cs" />
     <Compile Include="Utility\MemHax.cs" />
     <Compile Include="Utility\MemoryManipulator.cs" />
