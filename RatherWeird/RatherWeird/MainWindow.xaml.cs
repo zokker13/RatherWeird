@@ -404,6 +404,7 @@ namespace RatherWeird
             chHookNumpadEnter.IsChecked = settings.HookNumpadEnter;
             chSwapHealthbarLogic.IsChecked = settings.SwapHealthbarLogic;
             chDisableWinKey.IsChecked = settings.DisableWinKey;
+            chLaunchWithUi.IsChecked = settings.LaunchRa3Ui;
 
             txtRa3Path.Text = GetRa3Executable();
             lblVersion.Content = $"Version: {Constants.ApplicationVersion}";
@@ -476,6 +477,11 @@ namespace RatherWeird
                 string arguments = settings.LaunchRa3Windowed
                     ? " -win"
                     : "";
+
+                if (settings.LaunchRa3Ui)
+                {
+                    arguments += " -ui";
+                }
 
                 Process.Start(pathToRa3, arguments);
                 s?.Dispatcher.Invoke(() =>
@@ -601,6 +607,12 @@ namespace RatherWeird
         {
             _onlinePlayers.ProperlyClose();
             _memHax.CleanHandles();
+        }
+
+        private void chLaunchWithUi_Click(object sender, RoutedEventArgs e)
+        {
+            var adhocSender = sender as CheckBox;
+            settings.LaunchRa3Ui = adhocSender?.IsChecked == true;
         }
     }
 }

@@ -54,6 +54,7 @@ namespace RatherWeird
         public bool InvokeAltUp;
         public bool RemoveBorder;
         public bool LaunchRa3Windowed;
+        public bool LaunchRa3Ui;
         public string Ra3ExecutablePath;
         public bool RefreshPathToRa3;
         public bool HookNumpadEnter;
@@ -66,6 +67,7 @@ namespace RatherWeird
             LockCursor = true;
             InvokeAltUp = true;
             LaunchRa3Windowed = true;
+            LaunchRa3Ui = false;
             RefreshPathToRa3 = true;
             RemoveBorder = true;
             HookNumpadEnter = true;

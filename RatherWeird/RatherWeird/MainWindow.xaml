@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RatherWeird"
         mc:Ignorable="d"
-        Title="RatherWeird" Height="283.521" Width="534" Loaded="Window_Loaded" Closed="Window_Closed" ResizeMode="CanMinimize" Icon="dunno_man.ico" Closing="Window_Closing">
+        Title="RatherWeird" Height="290.521" Width="534" Loaded="Window_Loaded" Closed="Window_Closed" ResizeMode="CanMinimize" Icon="dunno_man.ico" Closing="Window_Closing">
     <DockPanel LastChildFill="True">
         <StatusBar Name="statusbar" DockPanel.Dock="Bottom">
             <Button Name="btnShowPlayers" Content="Show Players" Margin="10, 2, 0,2" Padding="5" Click="btnShowPlayers_Click">
@@ -21,7 +21,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <GroupBox x:Name="gpWindowBehavior" Header="Window Behavior" HorizontalAlignment="Left" Margin="10,10,0,0" Width="170" Height="184" VerticalAlignment="Top">
+        <GroupBox x:Name="gpWindowBehavior" Header="Window Behavior" HorizontalAlignment="Left" Margin="10,10,0,0" Width="170" Height="200" VerticalAlignment="Top">
             <Grid Margin="0,0,-2,-12">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -83,7 +83,14 @@
                         </StackPanel>
                     </CheckBox.ToolTip>
                 </CheckBox>
-            </Grid>
+                    <CheckBox x:Name="chLaunchWithUi" ToolTipService.ShowDuration="10000" Content="Launch RA3 with UI" HorizontalAlignment="Left" Margin="10,154,0,-63" VerticalAlignment="Top" Click="chLaunchWithUi_Click">
+                        <CheckBox.ToolTip>
+                            <StackPanel>
+                                <TextBlock><Run Text="Launches RA3 in a Window. Requires you to set the path in the right box."/></TextBlock>
+                            </StackPanel>
+                        </CheckBox.ToolTip>
+                    </CheckBox>
+                </Grid>
         </GroupBox>
         <GroupBox Header="Launch RA3" Margin="185,10,0,0" Height="110" VerticalAlignment="Top" HorizontalAlignment="Left" Width="322">
             <Grid>
