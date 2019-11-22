@@ -22,20 +22,22 @@ namespace RatherWeird.Utility
     {
         public static void Log(LogType type, string text)
         {
-            DateTime now = DateTime.Now;
-
-            string msg = $"[{now.ToString(CultureInfo.InvariantCulture)} ({type})] {text}";
-            using (StreamWriter sw = File.AppendText(Constants.Logfile))
+            try
             {
-                try
+                DateTime now = DateTime.Now;
+
+                string msg = $"[{now.ToString(CultureInfo.InvariantCulture)} ({type})] {text}";
+                using (var file = File.OpenWrite(Constants.Logfile))
+                using (var bufferedStream = new BufferedStream(file))
+                using (var sw = new StreamWriter(bufferedStream))
                 {
+                    file.Seek(0, SeekOrigin.End);
                     sw.WriteLine(msg);
                 }
-                catch (IOException)
-                {
-                    // Might be someone listeneing to the file
-                }
-                
+            }
+            catch (IOException)
+            {
+                // Might be someone listeneing to the file
             }
         }
 

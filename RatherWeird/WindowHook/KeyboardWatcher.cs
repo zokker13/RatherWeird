@@ -102,10 +102,10 @@ namespace WindowHook
         private struct KBDLLHOOKSTRUCT
         {
             public int vkCode;
-            int scanCode;
+            public int scanCode;
             public int flags;
-            int time;
-            int dwExtraInfo;
+            public int time;
+            public int dwExtraInfo;
         }
         
         private delegate IntPtr KeyboardLLHookHandler(
@@ -134,7 +134,7 @@ namespace WindowHook
                 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms644985(v=vs.85).aspx
                 if (code < 0)
                     return CallNextHookEx(IntPtr.Zero, code, wParam, ref lParam);
-
+                
                 foreach (var blacklistedKey in _blacklistedKeys)
                 {
                     if (blacklistedKey.Key == (Keys) lParam.vkCode

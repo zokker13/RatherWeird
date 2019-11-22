@@ -323,6 +323,9 @@ namespace RatherWeird
         
         private void HookNumpadEnter(KeyboardInputArgs e)
         {
+            Console.WriteLine($"Key: {e.Key}");
+            Console.WriteLine($"Flags: {e.Flags.ToString("X2")}");
+            Console.WriteLine($"Message: {e.KeyboardMessage}");
             if (settings.HookNumpadEnter == false)
                 return;
 
