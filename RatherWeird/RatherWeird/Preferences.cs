@@ -61,6 +61,7 @@ namespace RatherWeird
         public bool SwapHealthbarLogic;
         public bool DisableWinKey;
         public int SleepTime;
+        public Monitors Monitor;
 
         public SettingEntries()
         {
@@ -74,6 +75,7 @@ namespace RatherWeird
             SwapHealthbarLogic = false;
             DisableWinKey = false;
             SleepTime = 16;
+            Monitor = Monitors.Default();
         }
     }
 

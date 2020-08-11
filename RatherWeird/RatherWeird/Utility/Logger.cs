@@ -37,7 +37,7 @@ namespace RatherWeird.Utility
             }
             catch (IOException)
             {
-                // Might be someone listeneing to the file
+                // Might be someone listening to the file
             }
         }
 

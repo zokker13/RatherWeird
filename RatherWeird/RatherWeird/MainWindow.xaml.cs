@@ -400,6 +400,8 @@ namespace RatherWeird
 
         private void SetupControls()
         {
+            FillMonitorCombo();
+
             chInvokeAltUp.IsChecked = settings.InvokeAltUp;
             chLockCursor.IsChecked = settings.LockCursor;
             chLaunchRa3Windowed.IsChecked = settings.LaunchRa3Windowed;
@@ -409,10 +411,21 @@ namespace RatherWeird
             chDisableWinKey.IsChecked = settings.DisableWinKey;
             chLaunchWithUi.IsChecked = settings.LaunchRa3Ui;
 
+
             txtRa3Path.Text = GetRa3Executable();
             lblVersion.Content = $"Version: {Constants.ApplicationVersion}";
 
             Logger.Debug("OK.. setup of controls");
+        }
+
+        private void FillMonitorCombo()
+        {
+            var screens = this.GetScreens();
+            cbMonitor.Items.Add("Primary");
+            foreach (var screen in screens)
+            {
+                cbMonitor.Items.Add($"Monitor #{screen}");
+            }
         }
 
         private void chLaunchRa3Windowed_Click(object sender, RoutedEventArgs e)
@@ -616,6 +629,13 @@ namespace RatherWeird
         {
             var adhocSender = sender as CheckBox;
             settings.LaunchRa3Ui = adhocSender?.IsChecked == true;
+        }
+
+        private List<int> GetScreens()
+        {
+            var screens = Screen.AllScreens.Select((x, idx) => idx).ToList();
+
+            return screens;
         }
     }
 }
