@@ -70,7 +70,7 @@ namespace RatherWeird
 
         public void StopReoccuringTask()
         {
-            Logger.Info("Stopping Reoccuring task for shutdown");
+            Logger.Info("Stopping Reoccurring task for shutdown");
             _tokenSource.Cancel();
             _tokenSource.Dispose();
         }
@@ -86,7 +86,7 @@ namespace RatherWeird
 
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
-                    Logger.Error($"ER.. Could not get a proper status. Statuscode was ${response.StatusCode}");
+                    Logger.Error($"ER.. Could not get a proper status. Status Code was ${response.StatusCode}");
                     return null;
                 }
 
@@ -282,9 +282,9 @@ namespace RatherWeird
     internal class MetaMatch
     {
         [DataMember(Name = "playing")]
-        public Match[] Playing { get; set; }
+        public int[] Playing { get; set; }
         [DataMember(Name = "staging")]
-        public Match[] Staging { get; set; }
+        public int[] Staging { get; set; }
     }
 
     [DataContract]
