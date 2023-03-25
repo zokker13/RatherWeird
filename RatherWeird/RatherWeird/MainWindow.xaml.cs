@@ -540,11 +540,16 @@ namespace RatherWeird
             Console.WriteLine("Swapping called");
 
             byte byteToWrite = settings.SwapHealthbarLogic ? (byte)116 : (byte)117;
+            byte[] dataToWrite = new[] {byteToWrite};
+            int ra3Base = (int) LatestRa3?.MainModule?.BaseAddress;
+            IntPtr healthbarAddress = (IntPtr) (0x12EB93 + ra3Base);
+            IntPtr garrisonSlotsAddress = (IntPtr) (0x11A4A0 + ra3Base);
             //bool success = _memoryManipulator.WriteByte((IntPtr)(0x12EB93 + (int)LatestRa3?.MainModule?.BaseAddress), byteToWrite);
-            bool success = _memHax.WriteBytes(LatestRa3, (IntPtr) (0x12EB93 + (int) LatestRa3?.MainModule?.BaseAddress),
-                new[] {byteToWrite});
-            
-            Logger.Info($"swap healthbar logic successful: {success}");
+            bool healthBarSuccess = _memHax.WriteBytes(LatestRa3, healthbarAddress, dataToWrite);
+            bool garrisonSlotsSuccess = _memHax.WriteBytes(LatestRa3, garrisonSlotsAddress, dataToWrite);
+
+            Logger.Info($"swap healthbar logic successful: {healthBarSuccess} {garrisonSlotsSuccess}");
+
             tmr.Stop();
             
         }
